@@ -5,11 +5,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-void exit_with_error(char *error_msg)
-{
-    printf("%s\n", error_msg);
-    exit(1);
-}
+#include "../include/functions.h"
 
 void exit_on_wrong_usage(int argc, char *argv[])
 {
@@ -19,18 +15,6 @@ void exit_on_wrong_usage(int argc, char *argv[])
         printf("Usage: %s <SERVER_IP> <PORT_NUMBER>\n", argv[0]);
         exit(1);
     }
-}
-
-void recv_from(int client_sock, char buffer[])
-{
-    // Set buffer to null
-    bzero(buffer, 256);
-
-    // Send a message
-    int result = recv(client_sock, buffer, 255, 0);
-
-    if (result < 0)
-        exit_with_error("Error: recv() Failed.");
 }
 
 int main(int argc, char *argv[])

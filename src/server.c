@@ -8,21 +8,10 @@
 #include <unistd.h>
 #include <pthread.h>
 
+#include "../include/functions.h"
+
 #define MAX_CLIENTS 2
 #define CATEGORY_SIZE 10
-
-void exit_with_error(char *error_msg)
-{
-    printf("%s\n", error_msg);
-    exit(1);
-}
-
-void close_sockets(int c1_sock, int c2_sock, int s_sock)
-{
-    close(c1_sock);
-    close(c2_sock);
-    close(s_sock);
-}
 
 void exit_on_wrong_usage(int argc, char *argv[])
 {
@@ -32,14 +21,6 @@ void exit_on_wrong_usage(int argc, char *argv[])
         printf("Usage: %s <PORT_NUMBER>\n", argv[0]);
         exit(1);
     }
-}
-
-void send_to(int client_sock, char buffer[])
-{
-    int result = send(client_sock, buffer, strlen(buffer), 0);
-
-    if (result < 0)
-        exit_with_error("Error: send() Failed.");
 }
 
 void pick_category(int c1_sock, int c2_sock)
