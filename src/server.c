@@ -36,7 +36,6 @@ void exit_on_wrong_usage(int argc, char *argv[])
 
 void send_to(int client_sock, char buffer[])
 {
-    // Send a message
     int result = send(client_sock, buffer, strlen(buffer), 0);
 
     if (result < 0)
@@ -45,7 +44,20 @@ void send_to(int client_sock, char buffer[])
 
 void pick_category(int c1_sock, int c2_sock)
 {
-    char *categories[CATEGORY_SIZE] = {"Aquatic Animals", "Filipino Food", "Sports", "Fast Food Restaurants", "Philippine Cities", "Fruits", "ADNU Buildings", "Sneaker Brands", "NBA Teams", "Colors"};
+    char *categories[CATEGORY_SIZE] =
+        {
+            "Aquatic Animals",
+            "Filipino Food",
+            "Sports",
+            "Fast Food Restaurants",
+            "Philippine Cities",
+            "Fruits",
+            "ADNU Buildings",
+            "Sneaker Brands",
+            "NBA Teams",
+            "Colors",
+        };
+
     int random_index = rand() % CATEGORY_SIZE;
 
     printf("[Server]: The category is: %s\n", categories[random_index]);
