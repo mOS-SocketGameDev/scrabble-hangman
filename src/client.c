@@ -53,12 +53,17 @@ int main(int argc, char *argv[])
 
     printf("The category is: %s\n", buffer);
 
-    int res = recv(client_sock, role, 255, 0);
-    if (res < 0)
-        exit_with_error("Error: recv() Failed.");
-
+    char role [256];
+    memset(role, 0, 255);
+    recv(client_sock, role, 255, 0);
     printf("%s\n", role);
 
+    if (strcmp(role, "You are the guesser!") == 0) {
+       printf("guess the word");
+    }
+    else {
+       printf("provide the word");
+    }
     close(client_sock);
 
     return 0;
