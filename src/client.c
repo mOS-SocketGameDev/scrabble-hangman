@@ -58,6 +58,25 @@ int main(int argc, char *argv[])
     if (strcmp(role, "Provider") == 0)
         printf("The role is: %s\n", role);
 
+    // temporary
+    char message[256];
+
+    while (1)
+    {
+        // send
+        printf("You: ");
+        bzero(message, 256);
+
+        fgets(message, 255, stdin);
+        send_to(client_sock, message);
+
+        bzero(message, 256);
+
+        // recieve
+        recv_from(client_sock, message);
+        printf("Client 2: %s", message);
+    }
+
     close(client_sock);
 
     return 0;

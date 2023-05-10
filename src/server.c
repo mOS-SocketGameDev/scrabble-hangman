@@ -121,6 +121,16 @@ int main(int argc, char *argv[])
 
         printf("[Server]: Assigning player roles...\n");
         assign_player_roles(clients);
+
+        char message[256];
+        while (1)
+        {
+            recv_from(clients[0], message);
+            send_to(clients[1], message);
+
+            recv_from(clients[1], message);
+            send_to(clients[0], message);
+        }
     }
 
     // Close the sockets
