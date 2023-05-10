@@ -53,13 +53,13 @@ void assign_player_roles(int clients[MAX_CLIENTS])
 
     if (random_index == 0)
     {
-        send_to(clients[0], "You are the guesser!");
-        send_to(clients[1], "You are the provider!");
+        send_to(clients[0], "Guesser");
+        send_to(clients[1], "Provider");
     }
     else
     {
-        send_to(clients[0], "You are the provider!");
-        send_to(clients[1], "You are the guesser!");
+        send_to(clients[0], "Provider");
+        send_to(clients[1], "Guesser");
     }
 }
 

@@ -43,28 +43,24 @@ int main(int argc, char *argv[])
     // Start of communication
     printf("Connected to server at %s:%s.\n", argv[1], argv[2]);
 
-    char buffer[256], role[256];
+    char category[256], role[256];
 
-    bzero(buffer, 256);
+    bzero(category, 256);
+    bzero(role, 256);
 
-    int result = recv(client_sock, buffer, 255, 0);
-    if (result < 0)
-        exit_with_error("Error: recv() Failed.");
+    recv_from(client_sock, category);
+    printf("The category is: %s\n", category);
 
-    printf("The category is: %s\n", buffer);
+    recv_from(client_sock, role);
 
-    int res = recv(client_sock, role, 255, 0);
-    if (res < 0)
-        exit_with_error("Error: recv() Failed.");
-
-   printf("%s\n");
-	if (strcmp(role, "You are the guesser!") == 0) {
-   		printf("guess!");
-	} else if (strcmp(role, "You are the provider!") == 0) {
-   		printf("provide!");
-	} else {
-    	printf("bypassed!");
-	}
+    if (strcmp(role, "Guesser") == 0)
+    {
+        printf("The role is: %s\n", role);
+    }
+    if (strcmp(role, "Provider") == 0)
+    {
+        printf("The role is: %s\n", role);
+    }
 
     close(client_sock);
 
