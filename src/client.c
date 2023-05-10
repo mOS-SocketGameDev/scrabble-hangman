@@ -54,13 +54,9 @@ int main(int argc, char *argv[])
     recv_from(client_sock, role);
 
     if (strcmp(role, "Guesser") == 0)
-    {
         printf("The role is: %s\n", role);
-    }
     if (strcmp(role, "Provider") == 0)
-    {
         printf("The role is: %s\n", role);
-    }
 
     close(client_sock);
 

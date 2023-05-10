@@ -49,7 +49,7 @@ void pick_category(int c1_sock, int c2_sock)
 void assign_player_roles(int clients[MAX_CLIENTS])
 {
     int random_index = rand() % MAX_CLIENTS;
-    printf("[Server]: The guesser is: %s\n", (random_index == 0 ? "Client 1" : "Client 2"));
+    (random_index == 0) ? printf("[Server]: Client 1 is the Provider!") : printf("[Server]: Client 2 is the Guesser!");
 
     if (random_index == 0)
     {
@@ -100,19 +100,26 @@ int main(int argc, char *argv[])
     if (clients[0] < 0)
         exit_with_error("Error: accept() Failed.");
 
+    printf("[Server]: Client 1 has successfully joined.\n");
+
     // Accept a second connection
     clients[1] = accept(server_sock, (struct sockaddr *)&client_addr, &client_size);
     if (clients[1] < 0)
         exit_with_error("Error: accept() Failed.");
 
-    bool client_full = (clients[0] != 0 && clients[1] != 0);
+    printf("[Server]: Client 2 has successfully joined.\n");
 
-    if (client_full)
+    bool is_client_full = (clients[0] != 0 && clients[1] != 0);
+
+    if (is_client_full)
     {
+        // initialize game configs
         printf("[Server]: Game is starting...\n");
         printf("[Server]: Picking category...\n");
 
         pick_category(clients[0], clients[1]);
+
+        printf("[Server]: Assigning player roles...\n");
         assign_player_roles(clients);
     }
 
