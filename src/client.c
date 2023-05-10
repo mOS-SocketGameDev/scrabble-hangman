@@ -57,7 +57,14 @@ int main(int argc, char *argv[])
     if (res < 0)
         exit_with_error("Error: recv() Failed.");
 
-    printf("%s\n", role);
+   printf("%s\n");
+	if (strcmp(role, "You are the guesser!") == 0) {
+   		printf("guess!");
+	} else if (strcmp(role, "You are the provider!") == 0) {
+   		printf("provide!");
+	} else {
+    	printf("bypassed!");
+	}
 
     close(client_sock);
 
