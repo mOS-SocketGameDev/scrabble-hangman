@@ -1,4 +1,4 @@
-PORT=8001
+PORT=8000
 
 build: 
 	@mkdir bin
