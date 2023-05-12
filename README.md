@@ -21,3 +21,26 @@ CLIENT_2_ADDRESS=127.0.0.2
 ./bin/server 8000
 ./bin/client 127.0.0.n 8000
 ```
+
+### Naming Convention:
+```c
+use lower_case
+
+// sending
+int s_category_res = send(client_sock, buff...
+int s_category0_res = send(client_sock, buff...
+if (s_category_res < 0)
+{
+    ...
+}
+```
+
+```c
+// recieving
+int r_category_res = send(client_sock, buff...
+int r_category0_res = send(client_sock, buff...
+if (r_category_res < 0)
+{
+    ...
+}
+```
