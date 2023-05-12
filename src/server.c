@@ -12,6 +12,7 @@
 
 #define MAX_CLIENTS 2
 #define CATEGORY_SIZE 10
+#define BUFF_SIZE 255
 
 void exit_on_wrong_usage(int argc, char *argv[])
 {
@@ -42,24 +43,31 @@ void pick_category(int c1_sock, int c2_sock)
     int random_index = rand() % CATEGORY_SIZE;
 
     printf("[Server]: The category is: %s\n", categories[random_index]);
-    send_to(c1_sock, categories[random_index]);
-    send_to(c2_sock, categories[random_index]);
+
+    // Send 2 buffers
+    int res1_1 = send(c1_sock, categories[random_index], BUFF_SIZE, 0);
+    int res1_2 = send(c2_sock, categories[random_index], BUFF_SIZE, 0);
 }
 
-void assign_player_roles(int clients[MAX_CLIENTS])
+void assign_player_roles(int c1_sock, int c2_sock)
 {
     int random_index = rand() % MAX_CLIENTS;
-    (random_index == 0) ? printf("[Server]: Client 1 is the Provider!") : printf("[Server]: Client 2 is the Guesser!");
 
     if (random_index == 0)
     {
-        send_to(clients[0], "Guesser");
-        send_to(clients[1], "Provider");
+        printf("[Server]: Client 1 is the Guesser!\n");
+        printf("[Server]: Client 2 is the Provider!\n");
+        // Send 2 buffers
+        int res1_1 = send(c1_sock, "GUESSER", BUFF_SIZE, 0);
+        int res1_2 = send(c2_sock, "PROVIDER", BUFF_SIZE, 0);
     }
     else
     {
-        send_to(clients[0], "Provider");
-        send_to(clients[1], "Guesser");
+        printf("[Server]: Client 1 is the Provider!\n");
+        printf("[Server]: Client 2 is the Guesser!\n");
+        // Send 2 buffers
+        int res1_1 = send(c1_sock, "PROVIDER", BUFF_SIZE, 0);
+        int res1_2 = send(c2_sock, "GUESSER", BUFF_SIZE, 0);
     }
 }
 
@@ -115,22 +123,9 @@ int main(int argc, char *argv[])
     {
         // initialize game configs
         printf("[Server]: Game is starting...\n");
-        printf("[Server]: Picking category...\n");
 
         pick_category(clients[0], clients[1]);
-
-        printf("[Server]: Assigning player roles...\n");
-        assign_player_roles(clients);
-
-        char message[256];
-        while (1)
-        {
-            recv_from(clients[0], message);
-            send_to(clients[1], message);
-
-            recv_from(clients[1], message);
-            send_to(clients[0], message);
-        }
+        assign_player_roles(clients[0], clients[1]);
     }
 
     // Close the sockets

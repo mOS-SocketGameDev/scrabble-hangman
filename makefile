@@ -1,4 +1,4 @@
-PORT=8000
+PORT=8003
 IP_ADDRESS := $(shell hostname -I | cut -d' ' -f1)
 
 # prints the ip address of this machine and the server port to 
@@ -28,8 +28,8 @@ run-client:
 # uses a temp address.
 run-client-1: 
 	@clear
-	@./bin/client 192.168.50.1 $(PORT)
+	@./bin/client 127.0.0.1 $(PORT)
 
 run-client-2: 
 	@clear
-	@./bin/client 192.168.50.2 $(PORT)
+	@./bin/client 127.0.0.2 $(PORT)

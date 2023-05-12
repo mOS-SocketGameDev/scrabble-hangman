@@ -7,6 +7,9 @@
 
 #include "../include/functions.h"
 
+#define BUFF_SIZE 255
+#define MAX_ROUNDS 4
+
 void exit_on_wrong_usage(int argc, char *argv[])
 {
     // Checks if the argument is supplied upon running the program
@@ -43,57 +46,28 @@ int main(int argc, char *argv[])
     // Start of communication
     printf("Connected to server at %s:%s.\n", argv[1], argv[2]);
 
-    char category[256], role[256];
+    // init the buffers to be recieved -- category, role.
+    char category[BUFF_SIZE], role[BUFF_SIZE];
 
-    bzero(category, 256);
-    bzero(role, 256);
+    // recieve the buffer
+    bzero(category, BUFF_SIZE);
+    int category_res = recv(client_sock, category, BUFF_SIZE, 0);
 
-    recv_from(client_sock, category);
-    printf("The category is: %s\n", category);
+    // categories is...
+    printf("Category: %s\n", category);
 
-    recv_from(client_sock, role);
+    // recieve the buffer
+    bzero(role, BUFF_SIZE);
+    int buffer2_res = recv(client_sock, role, BUFF_SIZE, 0);
 
-    // temporary
-    char message[256];
-    if (strcmp(role, "Guesser") == 0)
+    // your role is...
+    printf("Role: %s\n", role);
+
+    if (strcmp(role, "GUESSER") == 0)
     {
-        printf("The role is: %s\n", role);
-
-        while (1)
-        {
-            // send
-            // recieve
-            recv_from(client_sock, message);
-            printf("[Client]: %s", message);
-
-            printf("[You]: ");
-            bzero(message, 256);
-
-            fgets(message, 255, stdin);
-            send_to(client_sock, message);
-
-            bzero(message, 256);
-        }
     }
-    if (strcmp(role, "Provider") == 0)
+    if (strcmp(role, "PROVIDER") == 0)
     {
-        printf("The role is: %s\n", role);
-
-        while (1)
-        {
-            // send
-            printf("[You]: ");
-            bzero(message, 256);
-
-            fgets(message, 255, stdin);
-            send_to(client_sock, message);
-
-            bzero(message, 256);
-
-            // recieve
-            recv_from(client_sock, message);
-            printf("[Client]: %s", message);
-        }
     }
 
     close(client_sock);
