@@ -44,31 +44,40 @@ void pick_category(int c1_sock, int c2_sock)
 
     printf("[Server]: The category is: %s\n", categories[random_index]);
 
-    // Send 2 buffers
+    // send 2 buffers
     int res1_1 = send(c1_sock, categories[random_index], BUFF_SIZE, 0);
     int res1_2 = send(c2_sock, categories[random_index], BUFF_SIZE, 0);
 }
 
-void assign_player_roles(int c1_sock, int c2_sock)
+int assign_player_roles(int c1_sock, int c2_sock)
 {
     int random_index = rand() % MAX_CLIENTS;
+    int s_category0_rs, s_category1_rs;
 
     if (random_index == 0)
     {
         printf("[Server]: Client 1 is the Guesser!\n");
         printf("[Server]: Client 2 is the Provider!\n");
-        // Send 2 buffers
-        int res1_1 = send(c1_sock, "GUESSER", BUFF_SIZE, 0);
-        int res1_2 = send(c2_sock, "PROVIDER", BUFF_SIZE, 0);
+        // send 2 buffers
+        s_category0_rs = send(c1_sock, "GUESSER", BUFF_SIZE, 0);
+        s_category1_rs = send(c2_sock, "PROVIDER", BUFF_SIZE, 0);
     }
     else
     {
         printf("[Server]: Client 1 is the Provider!\n");
         printf("[Server]: Client 2 is the Guesser!\n");
-        // Send 2 buffers
-        int res1_1 = send(c1_sock, "PROVIDER", BUFF_SIZE, 0);
-        int res1_2 = send(c2_sock, "GUESSER", BUFF_SIZE, 0);
+        // send 2 buffers
+        s_category0_rs = send(c1_sock, "PROVIDER", BUFF_SIZE, 0);
+        s_category1_rs = send(c2_sock, "GUESSER", BUFF_SIZE, 0);
     }
+
+    if (s_category0_rs < 0 || s_category1_rs < 0)
+    {
+        exit_with_error("Sending categories failed.");
+    }
+
+    // return which one is the guesser
+    return random_index;
 }
 
 int main(int argc, char *argv[])
@@ -85,12 +94,12 @@ int main(int argc, char *argv[])
 
     printf("[Server]: starting at localhost:%s\n", argv[1]);
 
-    // Create a socket for incoming connections
+    // create a socket for incoming connections
     server_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (server_sock < 0)
         exit_with_error("Error: socket() Failed.");
 
-    // Bind socket to a port
+    // bind socket to a port
     bzero((char *)&server_addr, sizeof(server_addr));
     server_addr.sin_family = AF_INET;          // Internet address
     server_addr.sin_addr.s_addr = INADDR_ANY;  // Any incoming interface
@@ -99,10 +108,10 @@ int main(int argc, char *argv[])
     if (bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
         exit_with_error("Error: bind() Failed.");
 
-    // Mark the socket so it will listen for incoming connections
+    // mark the socket so it will listen for incoming connections
     listen(server_sock, 5);
 
-    // Accept the first connection
+    // accept the first connection
     int client_size = sizeof(client_addr);
     clients[0] = accept(server_sock, (struct sockaddr *)&client_addr, &client_size);
     if (clients[0] < 0)
@@ -110,7 +119,7 @@ int main(int argc, char *argv[])
 
     printf("[Server]: Client 1 has successfully joined.\n");
 
-    // Accept a second connection
+    // accept a second connection
     clients[1] = accept(server_sock, (struct sockaddr *)&client_addr, &client_size);
     if (clients[1] < 0)
         exit_with_error("Error: accept() Failed.");
@@ -125,10 +134,26 @@ int main(int argc, char *argv[])
         printf("[Server]: Game is starting...\n");
 
         pick_category(clients[0], clients[1]);
-        assign_player_roles(clients[0], clients[1]);
+        int guesser_res = assign_player_roles(clients[0], clients[1]);
+
+        // handle the communication here...
+        char message[BUFF_SIZE];
+        int recv_to = (guesser_res == 0) ? 1 : 0;
+        int send_to = (recv_to == 0) ? 1 : 0;
+
+        while (1)
+        {
+            bzero(message, BUFF_SIZE);
+            int r_message0_res = recv(clients[recv_to], message, BUFF_SIZE, 0);
+            int s_message0_res = send(clients[send_to], message, BUFF_SIZE, 0);
+
+            bzero(message, BUFF_SIZE);
+            int r_message1_res = recv(clients[send_to], message, BUFF_SIZE, 0);
+            int s_message1_res = send(clients[recv_to], message, BUFF_SIZE, 0);
+        }
     }
 
-    // Close the sockets
+    // close the sockets
     close_sockets(clients[0], clients[1], server_sock);
 
     return 0;
