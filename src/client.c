@@ -29,26 +29,6 @@ void hide_word(char masked_message[], char word[])
     }
 }
 
-void setup_server_addr(struct sockaddr_in *server_addr, const char *ip_address, int port)
-{
-    // Clear the server address structure
-    memset(server_addr, 0, sizeof(*server_addr));
-
-    // Set up the server address structure
-    server_addr->sin_family = AF_INET;
-    server_addr->sin_port = htons(port);
-    inet_aton(ip_address, &server_addr->sin_addr);
-}
-
-void connect_to_server(int client_sock, struct sockaddr_in *server_addr)
-{
-
-    if (connect(client_sock, (struct sockaddr *)server_addr, sizeof(*server_addr)) < 0)
-    {
-        perror("Error: connect() Failed.");
-    }
-}
-
 int main(int argc, char *argv[])
 {
     char *CLIENT_ADDRESS = argv[1],
