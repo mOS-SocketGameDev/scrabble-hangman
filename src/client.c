@@ -23,37 +23,57 @@ void exit_on_wrong_usage(int argc, char *argv[])
 void hide_word(char masked_message[], char word[])
 {
     strcpy(masked_message, word);
-    for (int i = 0; i < strlen(masked_message); i++)
+    for (int i = 0; i < strlen(masked_message) - 1; i++)
     {
         masked_message[i] = '*';
     }
 }
 
+void setup_server_addr(struct sockaddr_in *server_addr, const char *ip_address, int port)
+{
+    // Clear the server address structure
+    memset(server_addr, 0, sizeof(*server_addr));
+
+    // Set up the server address structure
+    server_addr->sin_family = AF_INET;
+    server_addr->sin_port = htons(port);
+    inet_aton(ip_address, &server_addr->sin_addr);
+}
+
+void connect_to_server(int client_sock, struct sockaddr_in *server_addr)
+{
+
+    if (connect(client_sock, (struct sockaddr *)server_addr, sizeof(*server_addr)) < 0)
+    {
+        perror("Error: connect() Failed.");
+    }
+}
+
 int main(int argc, char *argv[])
 {
+    char *CLIENT_ADDRESS = argv[1],
+         *SERVER_PORT = argv[2];
     struct sockaddr_in server_addr;
 
     exit_on_wrong_usage(argc, argv);
 
     printf("Client is starting...\n");
 
+    // server connection setup...
     // create a socket for the client
     int client_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (client_sock < 0)
+    {
         exit_with_error("Error: socket() Failed.");
+    }
 
     // set up the server address structure
-    bzero((char *)&server_addr, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(atoi(argv[2]));
-    inet_aton(argv[1], &server_addr.sin_addr);
-
-    // connect to the server
-    if (connect(client_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
-        exit_with_error("Error: connect() Failed.");
+    // and connect to the server
+    setup_server_addr(&server_addr, CLIENT_ADDRESS, atoi(SERVER_PORT));
+    connect_to_server(client_sock, &server_addr);
 
     // start of communication/game
-    printf("Connected to server at %s:%s.\n", argv[1], argv[2]);
+    printf("Connected to server at %s:%s.\n", CLIENT_ADDRESS, SERVER_PORT);
     printf("------------------------------------------------\n");
     int current_attempts = 7;
     // init the buffers to be recieved -- category, role.

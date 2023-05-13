@@ -80,6 +80,37 @@ int assign_player_roles(int c1_sock, int c2_sock)
     return random_index;
 }
 
+void bind_to_server(int server_sock, int port)
+{
+    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(port);
+
+    if (bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+    {
+        perror("Error: bind() Failed.");
+        exit(EXIT_FAILURE);
+    }
+
+    // mark the socket so it will listen for incoming connections
+    listen(server_sock, 5);
+}
+
+int accept_client(int server_sock, struct sockaddr_in *client_addr)
+{
+    int client_size = sizeof(*client_addr);
+    int client_sock = accept(server_sock, (struct sockaddr *)client_addr, &client_size);
+    if (client_sock < 0)
+    {
+        perror("Error: accept() Failed.");
+        exit(EXIT_FAILURE);
+    }
+    printf("[Server]: Client has successfully joined.\n");
+    return client_sock;
+}
+
 int main(int argc, char *argv[])
 {
     int PORT_NUMBER = atoi(argv[1]);
@@ -97,34 +128,17 @@ int main(int argc, char *argv[])
     // create a socket for incoming connections
     server_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (server_sock < 0)
+    {
         exit_with_error("Error: socket() Failed.");
+    }
 
     // bind socket to a port
-    bzero((char *)&server_addr, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;          // Internet address
-    server_addr.sin_addr.s_addr = INADDR_ANY;  // Any incoming interface
-    server_addr.sin_port = htons(PORT_NUMBER); // Local port
-
-    if (bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
-        exit_with_error("Error: bind() Failed.");
-
-    // mark the socket so it will listen for incoming connections
-    listen(server_sock, 5);
+    bind_to_server(server_sock, PORT_NUMBER);
 
     // accept the first connection
-    int client_size = sizeof(client_addr);
-    clients[0] = accept(server_sock, (struct sockaddr *)&client_addr, &client_size);
-    if (clients[0] < 0)
-        exit_with_error("Error: accept() Failed.");
-
-    printf("[Server]: Client 1 has successfully joined.\n");
-
-    // accept a second connection
-    clients[1] = accept(server_sock, (struct sockaddr *)&client_addr, &client_size);
-    if (clients[1] < 0)
-        exit_with_error("Error: accept() Failed.");
-
-    printf("[Server]: Client 2 has successfully joined.\n");
+    memset(&client_addr, 0, sizeof(client_addr));
+    clients[0] = accept_client(server_sock, &client_addr);
+    clients[1] = accept_client(server_sock, &client_addr);
 
     bool is_client_full = (clients[0] != 0 && clients[1] != 0);
 
