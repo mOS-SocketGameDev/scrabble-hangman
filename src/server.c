@@ -19,7 +19,7 @@ void exit_on_wrong_usage(int argc, char *argv[])
     // Checks if the argument is supplied upon running the program
     if (argc < 2)
     {
-        printf("Usage: %s <PORT_NUMBER>\n", argv[0]);
+        print("%%RUsage: %s <PORT_NUMBER>%%0", argv[0]);
         exit(1);
     }
 }
@@ -42,7 +42,7 @@ void pick_category(int c1_sock, int c2_sock)
 
     int random_index = rand() % CATEGORY_SIZE;
 
-    printf("[Server]: The category is: %s\n", categories[random_index]);
+    print("%%G[Server]: The category is: %s%%0", categories[random_index]);
 
     // send 2 buffers
     int res1_1 = send(c1_sock, categories[random_index], BUFF_SIZE, 0);
@@ -56,16 +56,16 @@ int assign_player_roles(int c1_sock, int c2_sock)
 
     if (random_index == 0)
     {
-        printf("[Server]: Client 1 is the Guesser!\n");
-        printf("[Server]: Client 2 is the Provider!\n");
+        print("%%Y[Server]: Client 1 is the Guesser!%%0");
+        print("%%Y[Server]: Client 2 is the Provider!%%0");
         // send 2 buffers
         s_category0_rs = send(c1_sock, "GUESSER", BUFF_SIZE, 0);
         s_category1_rs = send(c2_sock, "PROVIDER", BUFF_SIZE, 0);
     }
     else
     {
-        printf("[Server]: Client 1 is the Provider!\n");
-        printf("[Server]: Client 2 is the Guesser!\n");
+        print("%%Y[Server]: Client 1 is the Provider!%%0");
+        print("%%Y[Server]: Client 2 is the Guesser!%%0");
         // send 2 buffers
         s_category0_rs = send(c1_sock, "PROVIDER", BUFF_SIZE, 0);
         s_category1_rs = send(c2_sock, "GUESSER", BUFF_SIZE, 0);
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
     exit_on_wrong_usage(argc, argv);
 
-    printf("[Server]: starting at localhost:%s\n", argv[1]);
+    print("%%Y[Server]: starting at localhost:%s%%0", argv[1]);
 
     // create a socket for incoming connections
     server_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
     if (is_client_full)
     {
         // initialize game configs
-        printf("[Server]: Game is starting...\n");
+        print("%%G[Server]: Game is starting...%%0");
 
         pick_category(clients[0], clients[1]);
         int guesser_res = assign_player_roles(clients[0], clients[1]);

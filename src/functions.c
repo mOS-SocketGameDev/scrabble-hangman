@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <stdarg.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -11,9 +12,78 @@
 
 #include "../include/functions.h"
 
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+
+/* HOW TO USE:
+ * This works by using:
+ *      %%Y -> YELLOW
+ *      %%R -> RED
+ *      %%G -> GREEN
+ *      %%0 -> RESET
+ * EXAMPLE:
+ *      print("%%Y[Server]: Server is starting...%%0"); -> prints out a yellow line
+ * NOTE: make sure to close the color by adding %%0 at the end of which word to stop the coloring
+ * EXAMPLE:
+ *      print("%%Y[Server]:%%0 Server is starting..."); -> only colors the word "[Server]:"
+ */
+void print(const char *format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    char buffer[1024];
+    vsprintf(buffer, format, args);
+    va_end(args);
+
+    char color[10] = "\0";
+    char *p = buffer;
+    while (*p)
+    {
+        if (*p == '%')
+        {
+            p++;
+            switch (*p)
+            {
+            case 'R':
+                strcpy(color, "\033[31m");
+                break;
+            case 'G':
+                strcpy(color, "\033[32m");
+                break;
+            case 'Y':
+                strcpy(color, "\033[33m");
+                break;
+            case '0':
+                strcpy(color, "\033[0m");
+                break;
+            default:
+                strcpy(color, "");
+                break;
+            }
+            printf("%s", color);
+            p++;
+        }
+        else if (*p == '%' && *(p + 1) == '%')
+        {
+            p += 2;
+            putchar('%');
+        }
+        else
+        {
+            putchar(*p);
+            p++;
+        }
+    }
+
+    if (strcmp(color, ""))
+        printf("\033[0m");
+    printf("\n");
+}
+
 void exit_with_error(char *error_msg)
 {
-    printf("%s\n", error_msg);
+    print("%%R%s%%0", error_msg);
     exit(1);
 }
 
@@ -46,7 +116,7 @@ void connect_to_server(int client_sock, struct sockaddr_in *server_addr)
 
     if (connect(client_sock, (struct sockaddr *)server_addr, sizeof(*server_addr)) < 0)
     {
-        perror("Error: connect() Failed.");
+        exit_with_error("Error: connect() Failed.");
     }
 }
 
@@ -61,8 +131,7 @@ void bind_to_server(int server_sock, int port)
 
     if (bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
-        perror("Error: bind() Failed.");
-        exit(EXIT_FAILURE);
+        exit_with_error("Error: bind() Failed.");
     }
 
     // mark the socket so it will listen for incoming connections
@@ -75,9 +144,8 @@ int accept_client(int server_sock, struct sockaddr_in *client_addr)
     int client_sock = accept(server_sock, (struct sockaddr *)client_addr, &client_size);
     if (client_sock < 0)
     {
-        perror("Error: accept() Failed.");
-        exit(EXIT_FAILURE);
+        exit_with_error("Error: accept() Failed.");
     }
-    printf("[Server]: Client has successfully joined.\n");
+    print("%%G[Server]: Client has successfully joined.%%0");
     return client_sock;
 }

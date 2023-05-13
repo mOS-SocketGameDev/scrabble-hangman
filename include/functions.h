@@ -11,4 +11,6 @@ void setup_server_addr(struct sockaddr_in *server_addr, const char *ip_address, 
 void connect_to_server(int client_sock, struct sockaddr_in *server_addr);
 void bind_to_server(int server_sock, int port);
 int accept_client(int server_sock, struct sockaddr_in *client_addr);
+
+void print(const char *format, ...);
 #endif

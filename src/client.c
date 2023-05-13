@@ -15,7 +15,7 @@ void exit_on_wrong_usage(int argc, char *argv[])
     // checks if the argument is supplied upon running the program
     if (argc < 3)
     {
-        printf("Usage: %s <SERVER_IP> <PORT_NUMBER>\n", argv[0]);
+        print("%%RUsage: %s <SERVER_IP> <PORT_NUMBER>%%0", argv[0]);
         exit(1);
     }
 }
@@ -29,6 +29,142 @@ void hide_word(char masked_message[], char word[])
     }
 }
 
+void draw_hangman(int guess_count)
+{
+    switch (guess_count)
+    {
+    case 0:
+        print(" _____________________________________________________");
+        print("|                                                     |");
+        print("|      (----)	 	                  (----)      |");
+        print("|     (* ( )*)     |_______________|     (* ( )*)     |");
+        print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
+        print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
+        print("|    ( (*) ) ))    ||             ||    ( (*) ) ))    |");
+        print("|     ( ())*))     ||             ||     ( (())*)     |");
+        print("|       (||)       ||             ||       (||)       |");
+        print("|        ||        ||             ||        ||        |");
+        print("|        ||        ||             ||        ||        |");
+        print("|--------||--------||-------------||--------||--------|");
+        print("|_____________________________________________________|");
+        print("|___________S_C_R_A_B_B_L_E__O_F__D_E_A_T_H___________|");
+        break;
+    case 1:
+        print(" _____________________________________________________");
+        print("|                                                     |");
+        print("|      (----)	 	                  (----)      |");
+        print("|     (* ( )*)     |_______________|     (* ( )*)     |");
+        print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
+        print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
+        print("|    ( (*) ) ))    ||             ||    ( (*) ) ))    |");
+        print("|     ( ())*))     ||             ||     ( (())*)     |");
+        print("|       (||)       ||      |      ||       (||)       |");
+        print("|        ||        ||             ||        ||        |");
+        print("|        ||        ||             ||        ||        |");
+        print("|--------||--------||-------------||--------||--------|");
+        print("|_____________________________________________________|");
+        print("|___________S_C_R_A_B_B_L_E__O_F__D_E_A_T_H___________|");
+        break;
+    case 2:
+        print(" _____________________________________________________");
+        print("|                                                     |");
+        print("|      (----)	 	                  (----)      |");
+        print("|     (* ( )*)     |_______________|     (* ( )*)     |");
+        print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
+        print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
+        print("|    ( (*) ) ))    ||             ||    ( (*) ) ))    |");
+        print("|     ( ())*))     ||             ||     ( (())*)     |");
+        print("|       (||)       ||     /|      ||       (||)       |");
+        print("|        ||        ||             ||        ||        |");
+        print("|        ||        ||             ||        ||        |");
+        print("|--------||--------||-------------||--------||--------|");
+        print("|_____________________________________________________|");
+        print("|___________S_C_R_A_B_B_L_E__O_F__D_E_A_T_H___________|");
+        break;
+    case 3:
+        print(" _____________________________________________________");
+        print("|                                                     |");
+        print("|      (----)	 	                  (----)      |");
+        print("|     (* ( )*)     |_______________|     (* ( )*)     |");
+        print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
+        print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
+        print("|    ( (*) ) ))    ||             ||    ( (*) ) ))    |");
+        print("|     ( ())*))     ||             ||     ( (())*)     |");
+        print("|       (||)       ||     /|\\     ||       (||)       |");
+        print("|        ||        ||             ||        ||        |");
+        print("|        ||        ||             ||        ||        |");
+        print("|--------||--------||-------------||--------||--------|");
+        print("|_____________________________________________________|");
+        print("|___________S_C_R_A_B_B_L_E__O_F__D_E_A_T_H___________|");
+        break;
+    case 4:
+        print(" _____________________________________________________");
+        print("|                                                     |");
+        print("|      (----)	 	                  (----)      |");
+        print("|     (* ( )*)     |_______________|     (* ( )*)     |");
+        print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
+        print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
+        print("|    ( (*) ) ))    ||             ||    ( (*) ) ))    |");
+        print("|     ( ())*))     ||             ||     ( (())*)     |");
+        print("|       (||)       ||     /|\\     ||       (||)       |");
+        print("|        ||        ||     /       ||        ||        |");
+        print("|        ||        ||             ||        ||        |");
+        print("|--------||--------||-------------||--------||--------|");
+        print("|_____________________________________________________|");
+        print("|___________S_C_R_A_B_B_L_E__O_F__D_E_A_T_H___________|");
+        break;
+    case 5:
+        print(" _____________________________________________________");
+        print("|                                                     |");
+        print("|      (----)	 	                  (----)      |");
+        print("|     (* ( )*)     |_______________|     (* ( )*)     |");
+        print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
+        print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
+        print("|    ( (*) ) ))    ||             ||    ( (*) ) ))    |");
+        print("|     ( ())*))     ||             ||     ( (())*)     |");
+        print("|       (||)       ||     /|\\     ||       (||)       |");
+        print("|        ||        ||     / \\     ||        ||        |");
+        print("|        ||        ||             ||        ||        |");
+        print("|--------||--------||-------------||--------||--------|");
+        print("|_____________________________________________________|");
+        print("|___________S_C_R_A_B_B_L_E__O_F__D_E_A_T_H___________|");
+        break;
+    case 6:
+        print(" _____________________________________________________");
+        print("|                                                     |");
+        print("|      (----)	 	                  (----)      |");
+        print("|     (* ( )*)     |_______________|     (* ( )*)     |");
+        print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
+        print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
+        print("|    ( (*) ) ))    ||             ||    ( (*) ) ))    |");
+        print("|     ( ())*))     ||       o     ||     ( (())*)     |");
+        print("|       (||)       ||     /|\\     ||       (||)       |");
+        print("|        ||        ||     / \\     ||        ||        |");
+        print("|        ||        ||             ||        ||        |");
+        print("|--------||--------||-------------||--------||--------|");
+        print("|_____________________________________________________|");
+        print("|___________S_C_R_A_B_B_L_E__O_F__D_E_A_T_H___________|");
+        break;
+    case 7:
+        print(" _____________________________________________________");
+        print("|                                                     |");
+        print("|      (----)	 	                  (----)      |");
+        print("|     (* ( )*)     |_______________|     (* ( )*)     |");
+        print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
+        print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
+        print("|    ( (*) ) ))    ||      |      ||    ( (*) ) ))    |");
+        print("|     ( ())*))     ||       o     ||     ( (())*)     |");
+        print("|       (||)       ||     /|\\     ||       (||)       |");
+        print("|        ||        ||     / \\     ||        ||        |");
+        print("|        ||        ||             ||        ||        |");
+        print("|--------||--------||-------------||--------||--------|");
+        print("|_____________________________________________________|");
+        print("|___________S_C_R_A_B_B_L_E__O_F__D_E_A_T_H___________|");
+    default:
+        break;
+    }
+}
+
 int main(int argc, char *argv[])
 {
     char *CLIENT_ADDRESS = argv[1],
@@ -37,7 +173,7 @@ int main(int argc, char *argv[])
 
     exit_on_wrong_usage(argc, argv);
 
-    printf("Client is starting...\n");
+    print("%%YClient is starting...%%0");
 
     // server connection setup...
     // create a socket for the client
@@ -53,8 +189,8 @@ int main(int argc, char *argv[])
     connect_to_server(client_sock, &server_addr);
 
     // start of communication/game
-    printf("Connected to server at %s:%s.\n", CLIENT_ADDRESS, SERVER_PORT);
-    printf("------------------------------------------------\n");
+    print("%%GConnected to server at %s:%s.%%0", CLIENT_ADDRESS, SERVER_PORT);
+    print("------------------------------------------------");
     int current_attempts = 7;
     // init the buffers to be recieved -- category, role.
     char category[BUFF_SIZE], role[BUFF_SIZE];
@@ -64,14 +200,14 @@ int main(int argc, char *argv[])
     int r_category_res = recv(client_sock, category, BUFF_SIZE, 0);
 
     // categories is...
-    printf("Category: %s\n", category);
+    print("Category: %s", category);
 
     // recieve the buffer
     bzero(role, BUFF_SIZE);
     int role_res = recv(client_sock, role, BUFF_SIZE, 0);
 
     // your role is...
-    printf("Role: %s\n", role);
+    print("Role: %s", role);
 
     char message[BUFF_SIZE];
     if (equal(role, "PROVIDER"))
@@ -90,11 +226,13 @@ int main(int argc, char *argv[])
             // receive the message
             bzero(message, BUFF_SIZE);
             int r_message_res = recv(client_sock, message, BUFF_SIZE, 0);
-            printf("Other player guessed: %s", message);
+            print("Other player guessed: %s", message);
         }
     }
+
     if (equal(role, "GUESSER"))
     {
+        print("%%YWaiting for the other player to provide a word...%%0");
         // receive the message
         bzero(message, BUFF_SIZE);
         int r_message_res = recv(client_sock, message, BUFF_SIZE, 0);
@@ -102,7 +240,7 @@ int main(int argc, char *argv[])
         // mask the word
         char masked_message[BUFF_SIZE];
         hide_word(masked_message, message);
-        printf("The word is: %s\n", masked_message);
+        print("The word is: %s", masked_message);
 
         // main loop
         while (1)
