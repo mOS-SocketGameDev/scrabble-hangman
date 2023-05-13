@@ -141,12 +141,13 @@ int main(int argc, char *argv[])
         int recv_to = (guesser_res == 0) ? 1 : 0;
         int send_to = (recv_to == 0) ? 1 : 0;
 
+        // recieve the first word and send to both clients
+        bzero(message, BUFF_SIZE);
+        int r_message0_res = recv(clients[recv_to], message, BUFF_SIZE, 0);
+        int s_message0_res = send(clients[send_to], message, BUFF_SIZE, 0);
         while (1)
         {
-            bzero(message, BUFF_SIZE);
-            int r_message0_res = recv(clients[recv_to], message, BUFF_SIZE, 0);
-            int s_message0_res = send(clients[send_to], message, BUFF_SIZE, 0);
-
+            // send/recieve the clients guesses
             bzero(message, BUFF_SIZE);
             int r_message1_res = recv(clients[send_to], message, BUFF_SIZE, 0);
             int s_message1_res = send(clients[recv_to], message, BUFF_SIZE, 0);

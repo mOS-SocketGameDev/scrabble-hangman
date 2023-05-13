@@ -20,6 +20,15 @@ void exit_on_wrong_usage(int argc, char *argv[])
     }
 }
 
+void mask_message(char masked_message[], char word[])
+{
+    strcpy(masked_message, word);
+    for (int i = 0; i < strlen(masked_message); i++)
+    {
+        masked_message[i] = '*';
+    }
+}
+
 int main(int argc, char *argv[])
 {
     struct sockaddr_in server_addr;
@@ -66,35 +75,39 @@ int main(int argc, char *argv[])
     char message[BUFF_SIZE];
     if (equal(role, "PROVIDER"))
     {
+        // an input from the user
+        printf("Enter a word: ");
+        bzero(message, BUFF_SIZE);
+        fgets(message, BUFF_SIZE, stdin);
+
+        // send to the server
+        int s_message_res = send(client_sock, message, BUFF_SIZE, 0);
+
         // main loop
         while (1)
         {
-            // an input from the user
-            printf("You: ");
-            bzero(message, BUFF_SIZE);
-            fgets(message, BUFF_SIZE, stdin);
-
-            // send to the server
-            int s_message_res = send(client_sock, message, BUFF_SIZE, 0);
-
             // receive the message
             bzero(message, BUFF_SIZE);
             int r_message_res = recv(client_sock, message, BUFF_SIZE, 0);
-            printf("Client: %s", message);
+            printf("Other player guessed: %s", message);
         }
     }
     if (equal(role, "GUESSER"))
     {
+        // receive the message
+        bzero(message, BUFF_SIZE);
+        int r_message_res = recv(client_sock, message, BUFF_SIZE, 0);
+
+        // mask the word
+        char masked_message[BUFF_SIZE];
+        mask_message(masked_message, message);
+        printf("The word is: %s\n", masked_message);
+
         // main loop
         while (1)
         {
-            // receive the message
-            bzero(message, BUFF_SIZE);
-            int r_message_res = recv(client_sock, message, BUFF_SIZE, 0);
-            printf("Client: %s", message);
-
             // an input from the user
-            printf("You: ");
+            printf("Guess: ");
             bzero(message, BUFF_SIZE);
             fgets(message, BUFF_SIZE, stdin);
 
