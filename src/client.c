@@ -44,8 +44,8 @@ int main(int argc, char *argv[])
         exit_with_error("Error: connect() Failed.");
 
     // start of communication
-    printf("Connected to server at %s:%s.\n\n", argv[1], argv[2]);
-
+    printf("Connected to server at %s:%s.\n", argv[1], argv[2]);
+    printf("------------------------------------------------\n");
     // init the buffers to be recieved -- category, role.
     char category[BUFF_SIZE], role[BUFF_SIZE];
 
@@ -64,8 +64,9 @@ int main(int argc, char *argv[])
     printf("Role: %s\n", role);
 
     char message[BUFF_SIZE];
-    if (strcmp(role, "PROVIDER") == 0)
+    if (equal(role, "PROVIDER"))
     {
+        // main loop
         while (1)
         {
             // an input from the user
@@ -82,8 +83,9 @@ int main(int argc, char *argv[])
             printf("Client: %s", message);
         }
     }
-    if (strcmp(role, "GUESSER") == 0)
+    if (equal(role, "GUESSER"))
     {
+        // main loop
         while (1)
         {
             // receive the message

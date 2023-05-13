@@ -22,3 +22,8 @@ void close_sockets(int c1_sock, int c2_sock, int s_sock)
     close(c2_sock);
     close(s_sock);
 }
+
+bool equal(char *s1, char *s2)
+{
+    return (strcmp(s1, s2) == 0);
+}
