@@ -20,7 +20,7 @@ void exit_on_wrong_usage(int argc, char *argv[])
     }
 }
 
-void mask_message(char masked_message[], char word[])
+void hide_word(char masked_message[], char word[])
 {
     strcpy(masked_message, word);
     for (int i = 0; i < strlen(masked_message); i++)
@@ -52,9 +52,10 @@ int main(int argc, char *argv[])
     if (connect(client_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
         exit_with_error("Error: connect() Failed.");
 
-    // start of communication
+    // start of communication/game
     printf("Connected to server at %s:%s.\n", argv[1], argv[2]);
     printf("------------------------------------------------\n");
+    int current_attempts = 7;
     // init the buffers to be recieved -- category, role.
     char category[BUFF_SIZE], role[BUFF_SIZE];
 
@@ -100,7 +101,7 @@ int main(int argc, char *argv[])
 
         // mask the word
         char masked_message[BUFF_SIZE];
-        mask_message(masked_message, message);
+        hide_word(masked_message, message);
         printf("The word is: %s\n", masked_message);
 
         // main loop
