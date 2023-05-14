@@ -1,4 +1,4 @@
-PORT=8000
+PORT=8001
 IP_ADDRESS := $(shell hostname -I | cut -d' ' -f1)
 
 # prints the ip address of this machine and the server port to 

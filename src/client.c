@@ -185,7 +185,7 @@ void draw_hangman(int guess_count)
 int main(int argc, char *argv[])
 {
     print_logo();
-    draw_hangman(3);
+
     char *CLIENT_ADDRESS = argv[1],
          *SERVER_PORT = argv[2];
     struct sockaddr_in server_addr;
@@ -265,6 +265,10 @@ int main(int argc, char *argv[])
         bzero(message, BUFF_SIZE);
         int r_message_res = recv(client_sock, message, BUFF_SIZE, 0);
 
+        // store the first word
+        char word[BUFF_SIZE];
+        strcpy(word, message);
+
         // mask the word
         char masked_message[BUFF_SIZE];
         hide_word(masked_message, message);
@@ -284,7 +288,7 @@ int main(int argc, char *argv[])
             guess_count++;
             if (guess_count == MAX_GUESS_ATTEMPTS) // if 7 guesses have been made, break the loop
             {
-                print("%%RYou have used up all your guesses. The word was %s.%%0", message);
+                print("%%RYou have used up all your guesses. The word was %s%%0", word);
                 break;
             }
         }
