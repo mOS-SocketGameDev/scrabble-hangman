@@ -226,6 +226,7 @@ int main(int argc, char *argv[])
     print("Role: %s", role);
 
     char message[BUFF_SIZE];
+    int guess_count = 0;
     if (equal(role, "PROVIDER"))
     {
         // an input from the user
@@ -237,12 +238,18 @@ int main(int argc, char *argv[])
         int s_message_res = send(client_sock, message, BUFF_SIZE, 0);
 
         // main loop
-        while (1)
+        while (guess_count < 7)
         {
             // receive the message
             bzero(message, BUFF_SIZE);
             int r_message_res = recv(client_sock, message, BUFF_SIZE, 0);
-            print("Other player guessed: %s", message);
+            printf("Other player guessed: %s", message);
+            guess_count++; 
+             if (guess_count == 7) // if 7 guesses have been made, break the loop
+                {
+                    printf("Guesser used up all attempts.");
+                    break;
+                }
         }
     }
 
@@ -259,7 +266,7 @@ int main(int argc, char *argv[])
         print("The word is: %s", masked_message);
 
         // main loop
-        while (1)
+        while (guess_count < 7)
         {
             // an input from the user
             printf("Guess: ");
@@ -268,6 +275,13 @@ int main(int argc, char *argv[])
 
             // send to the server
             int s_message_res = send(client_sock, message, BUFF_SIZE, 0);
+
+            guess_count++; 
+             if (guess_count == 7) // if 7 guesses have been made, break the loop
+                {
+                    printf("You have used up all your guesses. The word was %s.\n", message);
+                    break;
+                }
         }
     }
 
