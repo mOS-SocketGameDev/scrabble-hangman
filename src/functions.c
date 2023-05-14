@@ -16,6 +16,15 @@
 #include <stdio.h>
 #include <string.h>
 
+void print_logo()
+{
+    print("%%Y|-----------------------------------------------------|%%0");
+    print("%%Y|                                                     |%%0");
+    print("%%Y|           S C R A B B L E  O F  D E A T H           |%%0");
+    print("%%Y|                                                     |%%0");
+    print("%%Y|-----------------------------------------------------|%%0");
+}
+
 /* HOW TO USE:
  * This works by using:
  *      %%Y -> YELLOW
@@ -30,6 +39,7 @@
  */
 void print(const char *format, ...)
 {
+    printf("  ");
     va_list args;
     va_start(args, format);
     char buffer[1024];

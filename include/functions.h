@@ -13,4 +13,5 @@ void bind_to_server(int server_sock, int port);
 int accept_client(int server_sock, struct sockaddr_in *client_addr);
 
 void print(const char *format, ...);
+void print_logo();
 #endif

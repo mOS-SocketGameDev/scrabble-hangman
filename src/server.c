@@ -10,6 +10,7 @@
 
 #include "../include/functions.h"
 
+#define MAX_GUESS_ATTEMPTS 7
 #define MAX_CLIENTS 2
 #define CATEGORY_SIZE 10
 #define BUFF_SIZE 255
@@ -82,6 +83,8 @@ int assign_player_roles(int c1_sock, int c2_sock)
 
 int main(int argc, char *argv[])
 {
+    print_logo();
+
     int PORT_NUMBER = atoi(argv[1]);
     int server_sock;
     int clients[MAX_CLIENTS];
@@ -129,21 +132,21 @@ int main(int argc, char *argv[])
         int r_message0_res = recv(clients[recv_to], message, BUFF_SIZE, 0);
         int s_message0_res = send(clients[send_to], message, BUFF_SIZE, 0);
 
-        int attempts = 0; 
-        while (attempts != 7 )
-        { 
+        int attempts = 0;
+        while (attempts != MAX_GUESS_ATTEMPTS)
+        {
             // send/recieve the clients guesses
             bzero(message, BUFF_SIZE);
             int r_message1_res = recv(clients[send_to], message, BUFF_SIZE, 0);
             int s_message1_res = send(clients[recv_to], message, BUFF_SIZE, 0);
-            
-            attempts++; 
 
-            if (attempts == 7){
-                printf("Guesser lose.");
+            attempts++;
+
+            if (attempts == MAX_GUESS_ATTEMPTS)
+            {
+                print("%%R[Server]: Guesser lose.%%0");
                 close_sockets(clients[0], clients[1], server_sock);
             }
-
         }
     }
 

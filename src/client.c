@@ -184,6 +184,8 @@ void draw_hangman(int guess_count)
 
 int main(int argc, char *argv[])
 {
+    print_logo();
+
     char *CLIENT_ADDRESS = argv[1],
          *SERVER_PORT = argv[2];
     struct sockaddr_in server_addr;
@@ -207,7 +209,7 @@ int main(int argc, char *argv[])
 
     // start of communication/game
     print("%%GConnected to server at %s:%s.%%0", CLIENT_ADDRESS, SERVER_PORT);
-    print("------------------------------------------------");
+    print("%%G|-----------------------------------------------------|%%0");
     int current_attempts = 7;
     // init the buffers to be recieved -- category, role.
     char category[BUFF_SIZE], role[BUFF_SIZE];
@@ -217,14 +219,15 @@ int main(int argc, char *argv[])
     int r_category_res = recv(client_sock, category, BUFF_SIZE, 0);
 
     // categories is...
-    print("Category: %s", category);
+    print("CATEGORY: %%G%s%%0", category);
 
     // recieve the buffer
     bzero(role, BUFF_SIZE);
     int role_res = recv(client_sock, role, BUFF_SIZE, 0);
 
     // your role is...
-    print("Role: %s", role);
+    print("ROLE: %%G%s%%0", role);
+    print("");
 
     char message[BUFF_SIZE];
     int guess_count = 0;
@@ -232,7 +235,7 @@ int main(int argc, char *argv[])
     if (equal(role, "PROVIDER"))
     {
         // an input from the user
-        printf("Enter a word: ");
+        printf("  Enter a word: ");
         bzero(message, BUFF_SIZE);
         fgets(message, BUFF_SIZE, stdin);
 
@@ -245,11 +248,11 @@ int main(int argc, char *argv[])
             // receive the message
             bzero(message, BUFF_SIZE);
             int r_message_res = recv(client_sock, message, BUFF_SIZE, 0);
-            print("Other player guessed: %s", message);
+            print("%%YOther player guessed: %s%%0", message);
             guess_count++;
             if (guess_count == MAX_GUESS_ATTEMPTS) // if 7 guesses have been made, break the loop
             {
-                print("Guesser used up all attempts.");
+                print("%%RGuesser used up all attempts.%%0");
                 break;
             }
         }
@@ -271,7 +274,7 @@ int main(int argc, char *argv[])
         while (guess_count < MAX_GUESS_ATTEMPTS)
         {
             // an input from the user
-            printf("Guess: ");
+            printf("  Guess: ");
             bzero(message, BUFF_SIZE);
             fgets(message, BUFF_SIZE, stdin);
 
@@ -281,7 +284,7 @@ int main(int argc, char *argv[])
             guess_count++;
             if (guess_count == MAX_GUESS_ATTEMPTS) // if 7 guesses have been made, break the loop
             {
-                print("You have used up all your guesses. The word was %s.", message);
+                print("%%RYou have used up all your guesses. The word was %s.%%0", message);
                 break;
             }
         }
