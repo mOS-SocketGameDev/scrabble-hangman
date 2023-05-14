@@ -243,13 +243,13 @@ int main(int argc, char *argv[])
             // receive the message
             bzero(message, BUFF_SIZE);
             int r_message_res = recv(client_sock, message, BUFF_SIZE, 0);
-            printf("Other player guessed: %s", message);
-            guess_count++; 
-             if (guess_count == 7) // if 7 guesses have been made, break the loop
-                {
-                    printf("Guesser used up all attempts.");
-                    break;
-                }
+            print("Other player guessed: %s", message);
+            guess_count++;
+            if (guess_count == 7) // if 7 guesses have been made, break the loop
+            {
+                print("Guesser used up all attempts.");
+                break;
+            }
         }
     }
 
@@ -276,12 +276,12 @@ int main(int argc, char *argv[])
             // send to the server
             int s_message_res = send(client_sock, message, BUFF_SIZE, 0);
 
-            guess_count++; 
-             if (guess_count == 7) // if 7 guesses have been made, break the loop
-                {
-                    printf("You have used up all your guesses. The word was %s.\n", message);
-                    break;
-                }
+            guess_count++;
+            if (guess_count == 7) // if 7 guesses have been made, break the loop
+            {
+                print("You have used up all your guesses. The word was %s.", message);
+                break;
+            }
         }
     }
 
