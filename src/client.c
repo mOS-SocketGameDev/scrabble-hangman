@@ -9,6 +9,7 @@
 
 #define BUFF_SIZE 255
 #define MAX_ROUNDS 4
+#define MAX_GUESS_ATTEMPTS 7
 
 void exit_on_wrong_usage(int argc, char *argv[])
 {
@@ -227,6 +228,7 @@ int main(int argc, char *argv[])
 
     char message[BUFF_SIZE];
     int guess_count = 0;
+
     if (equal(role, "PROVIDER"))
     {
         // an input from the user
@@ -238,14 +240,14 @@ int main(int argc, char *argv[])
         int s_message_res = send(client_sock, message, BUFF_SIZE, 0);
 
         // main loop
-        while (guess_count < 7)
+        while (guess_count < MAX_GUESS_ATTEMPTS)
         {
             // receive the message
             bzero(message, BUFF_SIZE);
             int r_message_res = recv(client_sock, message, BUFF_SIZE, 0);
             print("Other player guessed: %s", message);
             guess_count++;
-            if (guess_count == 7) // if 7 guesses have been made, break the loop
+            if (guess_count == MAX_GUESS_ATTEMPTS) // if 7 guesses have been made, break the loop
             {
                 print("Guesser used up all attempts.");
                 break;
@@ -266,7 +268,7 @@ int main(int argc, char *argv[])
         print("The word is: %s", masked_message);
 
         // main loop
-        while (guess_count < 7)
+        while (guess_count < MAX_GUESS_ATTEMPTS)
         {
             // an input from the user
             printf("Guess: ");
@@ -277,7 +279,7 @@ int main(int argc, char *argv[])
             int s_message_res = send(client_sock, message, BUFF_SIZE, 0);
 
             guess_count++;
-            if (guess_count == 7) // if 7 guesses have been made, break the loop
+            if (guess_count == MAX_GUESS_ATTEMPTS) // if 7 guesses have been made, break the loop
             {
                 print("You have used up all your guesses. The word was %s.", message);
                 break;
