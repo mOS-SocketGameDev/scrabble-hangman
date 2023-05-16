@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 
 #include "../include/functions.h"
 
@@ -143,7 +144,7 @@ void bind_to_server(int server_sock, int port)
     {
         exit_with_error("Error: bind() Failed.");
     }
-    
+
     // Get the dynamically assigned port
     struct sockaddr_in assigned_address;
     socklen_t address_length = sizeof(assigned_address);
@@ -155,7 +156,6 @@ void bind_to_server(int server_sock, int port)
     // mark the socket so it will listen for incoming connections
     listen(server_sock, 5);
 }
-
 
 int accept_client(int server_sock, struct sockaddr_in *client_addr)
 {
