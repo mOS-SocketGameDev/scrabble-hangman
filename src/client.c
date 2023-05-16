@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 {
     print_logo();
 
-    char *CLIENT_ADDRESS = argv[1],
+    char *SERVER_IP_ADDRESS = argv[1],
          *SERVER_PORT = argv[2];
     struct sockaddr_in server_addr;
 
@@ -204,11 +204,11 @@ int main(int argc, char *argv[])
 
     // set up the server address structure
     // and connect to the server
-    setup_server_addr(&server_addr, CLIENT_ADDRESS, atoi(SERVER_PORT));
+    setup_server_addr(&server_addr, SERVER_IP_ADDRESS, atoi(SERVER_PORT));
     connect_to_server(client_sock, &server_addr);
 
     // start of communication/game
-    print("%%GConnected to server at %s:%s.%%0", CLIENT_ADDRESS, SERVER_PORT);
+    print("%%GConnected to server at %s:%s.%%0", SERVER_IP_ADDRESS, SERVER_PORT);
     print("%%G|-----------------------------------------------------|%%0");
     int current_attempts = 7;
     // init the buffers to be recieved -- category, role.
