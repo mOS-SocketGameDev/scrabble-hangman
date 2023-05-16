@@ -10,6 +10,8 @@
 #define BUFF_SIZE 255
 #define MAX_ROUNDS 4
 #define MAX_GUESS_ATTEMPTS 7
+#define MAX_WORD_LENGTH 10
+#define MAX_GUESSES 7
 
 void exit_on_wrong_usage(int argc, char *argv[])
 {
@@ -182,8 +184,101 @@ void draw_hangman(int guess_count)
     }
 }
 
+void draw_word_state(char word[], int letter_states[])
+{
+    printf("\nTHE WORD: ");
+    int word_length = strlen(word);
+    for (int i = 0; i < word_length; i++)
+    {
+        if (letter_states[i])
+        {
+            printf("%c", word[i]);
+        }
+        else
+        {
+            printf("*");
+        }
+    }
+    printf("\n");
+}
+
+// Take a guess from the user
+char take_guess(char guessed_letters[])
+{
+    char guess;
+    printf("Enter a letter: ");
+    scanf(" %c", &guess);
+
+    while (strchr(guessed_letters, guess) != NULL)
+    {
+        printf("You already guessed that letter.\n");
+        scanf("Enter a word: %c", &guess);
+    }
+    guessed_letters[strlen(guessed_letters)] = guess;
+    return guess;
+}
+
+// Check if the guess is correct and update the state of the word being guessed
+int check_guess(char guess, char word[], int letter_states[])
+{
+    int word_length = strlen(word);
+    int correct = 0;
+    // if (isalpha(guess))
+    // {
+    //     guess = tolower(guess);
+        for (int i = 0; i < word_length; i++)
+        {
+            if (word[i] == guess)
+            {
+                letter_states[i] = 1;
+                correct = 1;
+            }
+        }
+    // }
+
+    return correct;
+}
+
+// Check if the game is over
+int is_game_over(char word[], int letter_states[], int guess_count)
+{
+    int word_length = strlen(word);
+    int correct_count = 0;
+    for (int i = 0; i < word_length; i++)
+    {
+        if (letter_states[i])
+        {
+            correct_count++;
+        }
+    }
+    if (correct_count == word_length)
+    {
+        printf("\nCongratulations! You guessed the word. The word is: '%s'\n", word);
+        return 1;
+    }
+
+    if (guess_count == MAX_GUESSES)
+    {
+        draw_hangman(guess_count);
+        printf("\nYou lost. The word was '%s'\n", word);
+        return 1;
+    }
+
+    return 0;
+}
+
+
 int main(int argc, char *argv[])
 {
+
+  char word[MAX_WORD_LENGTH];
+  char guessed_letters[MAX_GUESSES] = {'\0'};
+  int letter_states[MAX_WORD_LENGTH] = {0};
+
+  int guess_count = 0;
+  int word_length;
+
+
     print_logo();
 
     char *SERVER_IP_ADDRESS = argv[1],
@@ -230,7 +325,7 @@ int main(int argc, char *argv[])
     print("");
 
     char message[BUFF_SIZE];
-    int guess_count = 0;
+    // int guess_count = 0;
 
     if (equal(role, "PROVIDER"))
     {
@@ -285,12 +380,35 @@ int main(int argc, char *argv[])
             // send to the server
             int s_message_res = send(client_sock, message, BUFF_SIZE, 0);
 
-            guess_count++;
-            if (guess_count == MAX_GUESS_ATTEMPTS) // if 7 guesses have been made, break the loop
-            {
-                print("%%RYou have used up all your guesses. The word was %s%%0", word);
-                break;
-            }
+            char guess = take_guess(guessed_letters);
+          int correct = check_guess(guess, word, letter_states);
+
+          if (correct)
+          {
+              printf("Correct guess!\n");
+          }
+          else
+          {
+              printf("Incorrect guess!\n");
+              guess_count++;
+              draw_hangman(guess_count);
+          }
+
+          draw_word_state(word, letter_states);
+
+
+          if (is_game_over(word, letter_states, guess_count))
+          {
+              // Game over, break the loop
+              break;
+          }
+          // guess_count++;
+          // if (guess_count == MAX_GUESS_ATTEMPTS) // if 7 guesses have been made, break the loop
+          // {
+          //     print("%%RGuesser used up all attempts.%%0");
+          //     break;
+          // }
+
         }
     }
 
@@ -298,3 +416,6 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+
+
