@@ -81,21 +81,26 @@ int main(int argc, char *argv[])
 
     // bind socket to a port
     bind_to_server(server_sock, PORT_NUMBER);
-    print("Server is starting...");
-    print("Waiting for connections...");
+    print(" ");
+    print(" Server is %%GStarting...");
+    print(" ");
+    print(" %%YWaiting for connections...");
+    print(" ");
 
     // accept the first connection
     memset(&client_addr, 0, sizeof(client_addr));
     int client_socket = accept_client(server_sock, &client_addr);
     if (client_socket < 0)
     {
-        exit_with_error("Error: accept() Failed.");
+        exit_with_error(" Error: accept() %%RFailed.");
     }
 
-    print("Client successfully connected.");
+    print(" %%GClient successfully connected.");
+    print(" ");
 
     // start game
-    print("--- Starting Game ---");
+    print("%%C|-------------%%0 %%GSTARTING SCRABBLE OF DEATH%%0 %%C------------|%%0");
+    print(" ");
 
     int current_attempts = MAX_GUESS_ATTEMPTS;
 
@@ -108,9 +113,13 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < MAX_ROUNDS; i++)
     {
-        print("--------------------------------------");
-        print("CATEGORY: %s", category);
-        print("ROLE: %s", role);
+        bool stop = false;
+
+        print("%%C|-----------------------------------------------------|");
+        print(" ");
+        print(" %%PCATEGORY:%%0 %s", category);
+        print(" %%PROLE:%%0 %s", role);
+        print(" ");
 
         if (equal(role, "PROVIDER"))
         {
@@ -136,7 +145,8 @@ int main(int argc, char *argv[])
 
         if (equal(role, "GUESSER"))
         {
-            print("Waiting for client to provide word...");
+            print(" %%YWaiting for client to provide word...");
+            print(" ");
             char word[BUFF_SIZE];
 
             recv(client_socket, word, BUFF_SIZE, 0);
@@ -144,7 +154,7 @@ int main(int argc, char *argv[])
             char masked_message[BUFF_SIZE];
             hide_word(masked_message, word);
 
-            print("The word is: %s", masked_message);
+            print(" The word is: %s", masked_message);
 
             char guess[BUFF_SIZE];
             while (1)

@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
 
     exit_on_wrong_usage(argc, argv);
 
-    print("%%YClient is starting...");
+    print(" ");
+    print(" %%YClient is %%GStarting...");
 
     // server connection setup...
     // create a socket for the client
@@ -46,9 +47,12 @@ int main(int argc, char *argv[])
     connect_to_server(client_socket, &server_addr);
 
     // start of communication/game
-    print("Successfully connected to server at %s:%s.", SERVER_IP_ADDRESS, SERVER_PORT);
+    print(" ");
+    print(" %%GSuccessfully connected to server at %s:%s.", SERVER_IP_ADDRESS, SERVER_PORT);
+    print(" ");
 
-    print("--- Starting Game ---");
+    print("%%C|-------------%%0 %%GSTARTING SCRABBLE OF DEATH%%0 %%C------------|%%0");
+    print(" ");
 
     int current_attempts = MAX_GUESS_ATTEMPTS;
 
@@ -66,16 +70,20 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < MAX_ROUNDS; i++)
     {
-        print("--------------------------------------");
-        print("CATEGORY: %s", category);
-        print("ROLE: %s", role);
+        bool stop = false;
+
+        print("%%C|-----------------------------------------------------|");
+        print(" ");
+        print(" %%PCATEGORY:%%0 %s", category);
+        print(" %%PROLE:%%0 %s", role);
+        print(" ");
 
         if (equal(role, "PROVIDER"))
         {
             char word[BUFF_SIZE];
 
             bzero(word, BUFF_SIZE);
-            printf("Enter a word: ");
+            printf(" Enter a word: ");
             fgets(word, BUFF_SIZE, stdin);
 
             send(client_socket, word, BUFF_SIZE, 0);
@@ -87,14 +95,18 @@ int main(int argc, char *argv[])
             if (equal(client_res, "DONE"))
             {
                 strcpy(role, "GUESSER");
-                print("Client has successfully cleared the round.");
+                print(" ");
+                print(" %%GClient has successfully cleared the round.");
+                print(" ");
                 continue;
             }
         }
 
         if (equal(role, "GUESSER"))
         {
-            print("Waiting for client to provide word...");
+            print(" ");
+            print(" %%YWaiting for client to provide word...");
+            print(" ");
             char word[BUFF_SIZE];
 
             recv(client_socket, word, BUFF_SIZE, 0);
@@ -102,7 +114,7 @@ int main(int argc, char *argv[])
             char masked_message[BUFF_SIZE];
             hide_word(masked_message, word);
 
-            print("The word is: %s", masked_message);
+            print(" The word is: %s", masked_message);
 
             char guess[BUFF_SIZE];
             while (1)

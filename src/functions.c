@@ -144,7 +144,7 @@ void connect_to_server(int client_sock, struct sockaddr_in *server_addr)
 
     if (connect(client_sock, (struct sockaddr *)server_addr, sizeof(*server_addr)) < 0)
     {
-        exit_with_error("Error: connect() Failed.");
+        exit_with_error(" Error: connect() Failed.");
     }
 }
 
@@ -159,7 +159,7 @@ void bind_to_server(int server_sock, int port)
 
     if (bind(server_sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
-        exit_with_error("Error: bind() Failed.");
+        exit_with_error(" Error: bind() Failed.");
     }
 
     // Get the dynamically assigned port
@@ -167,7 +167,7 @@ void bind_to_server(int server_sock, int port)
     socklen_t address_length = sizeof(assigned_address);
     if (getsockname(server_sock, (struct sockaddr *)&assigned_address, &address_length) == -1)
     {
-        perror("Failed to get socket name");
+        perror(" %%RFailed to get socket name");
         close(server_sock);
     }
 
@@ -181,9 +181,9 @@ int accept_client(int server_sock, struct sockaddr_in *client_addr)
     int client_sock = accept(server_sock, (struct sockaddr *)client_addr, &client_size);
     if (client_sock < 0)
     {
-        exit_with_error("Error: accept() Failed.");
+        exit_with_error(" Error: accept() Failed.");
     }
-    print("%%G[Server]: Client has successfully joined.%%0");
+    print(" %%G[Server]: Client has successfully joined.%%0");
     return client_sock;
 }
 
@@ -407,20 +407,22 @@ bool guess_handler(char word[])
     {
         if (wrong_guesses == MAX_GUESS_ATTEMPTS)
         {
-            printf("You lost!\n");
+            print(" %%RYou lost!");
             return false;
         }
 
         if (strcmp(guessed_word, word) == 0)
         {
-            printf("You guessed the word. You won this round!\n");
+            print(" %%GYou guessed the word. You won this round!");
+            print(" ");
             return true;
         }
 
         // guess
-        printf("Guess: ");
+        printf(" Guess: ");
         char guess;
         scanf(" %c", &guess);
+        print(" ");
 
         guess = tolower(guess);
 
@@ -435,13 +437,15 @@ bool guess_handler(char word[])
             }
         }
 
-        printf("The word is: %s\n", guessed_word);
+        printf(" The word is: %s\n", guessed_word);
 
         if (!found)
         {
             wrong_guesses++;
             draw_hangman(wrong_guesses);
-            printf("Wrong guess! Remaining attempts: %d\n", (MAX_GUESS_ATTEMPTS - wrong_guesses));
+            print(" ");
+            printf(" Wrong guess! Remaining attempts: %d\n", (MAX_GUESS_ATTEMPTS - wrong_guesses));
+            print(" ");
         }
     }
 }
