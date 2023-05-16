@@ -11,9 +11,9 @@
 
 #include "../include/functions.h"
 
-#define MAX_ROUNDS 4
+#define MAX_ROUNDS 2
 #define MAX_GUESS_ATTEMPTS 7
-#define MAX_CLIENTS 2
+#define MAX_CLIENTS 4
 #define CATEGORY_SIZE 10
 #define BUFF_SIZE 255
 
@@ -102,15 +102,21 @@ int main(int argc, char *argv[])
     // send category
     char *category = pick_category(client_socket);
     int roleNo = pick_role(client_socket);
-    char *role = (roleNo == 0) ? "PROVIDER" : "GUESSER";
 
-    print("CATEGORY: %s", category);
-    print("ROLE: %s", role);
+    char role[BUFF_SIZE];
+    strcpy(role, (roleNo == 0) ? "PROVIDER" : "GUESSER");
 
     for (int i = 0; i < MAX_ROUNDS; i++)
     {
+        bool stop = false;
+
+        print("--------------------------------------");
+        print("CATEGORY: %s", category);
+        print("ROLE: %s", role);
+
         if (equal(role, "GUESSER"))
         {
+            print("Waiting for client to provide word...");
             char word[BUFF_SIZE];
 
             recv(client_socket, word, BUFF_SIZE, 0);
@@ -121,22 +127,25 @@ int main(int argc, char *argv[])
             print("The word is: %s", masked_message);
 
             char guess[BUFF_SIZE];
-            while (current_attempts > 0)
+            while (1)
             {
-                bzero(guess, BUFF_SIZE);
-                printf("Guess: ");
-                fgets(guess, BUFF_SIZE, stdin);
-
                 bool res = guess_handler(word);
 
                 if (res)
                 {
-                    // swap
-                    role = "PROVIDER";
+                    // signal the server that the round is finished
+                    // time to swap
+                    strcpy(role, "PROVIDER");
+
+                    send(client_socket, "DONE", BUFF_SIZE, 0);
+                    stop = true;
                     break;
                 }
             }
         }
+
+        if (stop)
+            continue;
 
         if (equal(role, "PROVIDER"))
         {
@@ -147,6 +156,17 @@ int main(int argc, char *argv[])
             fgets(word, BUFF_SIZE, stdin);
 
             send(client_socket, word, BUFF_SIZE, 0);
+
+            char client_res[BUFF_SIZE];
+            bzero(client_res, BUFF_SIZE);
+            recv(client_socket, client_res, BUFF_SIZE, 0);
+
+            if (equal(client_res, "DONE"))
+            {
+                strcpy(role, "GUESSER");
+                print("Client has successfully cleared the round.");
+                continue;
+            }
         }
     }
 

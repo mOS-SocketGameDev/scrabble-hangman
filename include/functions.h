@@ -15,6 +15,7 @@ int accept_client(int server_sock, struct sockaddr_in *client_addr);
 void print(const char *format, ...);
 void print_logo();
 
+void draw_hangman(int guess_count);
 void hide_word(char masked_message[], char word[]);
 bool guess_handler(char word[]);
 #endif
