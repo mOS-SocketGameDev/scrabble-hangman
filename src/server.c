@@ -112,6 +112,28 @@ int main(int argc, char *argv[])
         print("CATEGORY: %s", category);
         print("ROLE: %s", role);
 
+        if (equal(role, "PROVIDER"))
+        {
+            char word[BUFF_SIZE];
+
+            bzero(word, BUFF_SIZE);
+            printf("Enter a word: ");
+            fgets(word, BUFF_SIZE, stdin);
+
+            send(client_socket, word, BUFF_SIZE, 0);
+
+            char client_res[BUFF_SIZE];
+            bzero(client_res, BUFF_SIZE);
+            recv(client_socket, client_res, BUFF_SIZE, 0);
+
+            if (equal(client_res, "DONE"))
+            {
+                strcpy(role, "GUESSER");
+                print("Client has successfully cleared the round.");
+                continue;
+            }
+        }
+
         if (equal(role, "GUESSER"))
         {
             print("Waiting for client to provide word...");
@@ -138,28 +160,6 @@ int main(int argc, char *argv[])
                     send(client_socket, "DONE", BUFF_SIZE, 0);
                     break;
                 }
-            }
-        }
-
-        if (equal(role, "PROVIDER"))
-        {
-            char word[BUFF_SIZE];
-
-            bzero(word, BUFF_SIZE);
-            printf("Enter a word: ");
-            fgets(word, BUFF_SIZE, stdin);
-
-            send(client_socket, word, BUFF_SIZE, 0);
-
-            char client_res[BUFF_SIZE];
-            bzero(client_res, BUFF_SIZE);
-            recv(client_socket, client_res, BUFF_SIZE, 0);
-
-            if (equal(client_res, "DONE"))
-            {
-                strcpy(role, "GUESSER");
-                print("Client has successfully cleared the round.");
-                continue;
             }
         }
     }
