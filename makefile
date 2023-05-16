@@ -1,4 +1,4 @@
-PORT=8000
+PORT=8001
 IP_ADDRESS := $(shell hostname -I | cut -d' ' -f1)
 SERVER_IP := 0
 

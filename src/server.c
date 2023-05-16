@@ -11,7 +11,7 @@
 
 #include "../include/functions.h"
 
-#define MAX_ROUNDS 2
+#define MAX_ROUNDS 4
 #define MAX_GUESS_ATTEMPTS 7
 #define MAX_CLIENTS 4
 #define CATEGORY_SIZE 10
@@ -108,11 +108,31 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < MAX_ROUNDS; i++)
     {
-        bool stop = false;
-
         print("--------------------------------------");
         print("CATEGORY: %s", category);
         print("ROLE: %s", role);
+
+        if (equal(role, "PROVIDER"))
+        {
+            char word[BUFF_SIZE];
+
+            bzero(word, BUFF_SIZE);
+            printf("Enter a word: ");
+            fgets(word, BUFF_SIZE, stdin);
+
+            send(client_socket, word, BUFF_SIZE, 0);
+
+            char client_res[BUFF_SIZE];
+            bzero(client_res, BUFF_SIZE);
+            recv(client_socket, client_res, BUFF_SIZE, 0);
+
+            if (equal(client_res, "DONE"))
+            {
+                strcpy(role, "GUESSER");
+                print("Client has successfully cleared the round.");
+                continue;
+            }
+        }
 
         if (equal(role, "GUESSER"))
         {
@@ -138,34 +158,8 @@ int main(int argc, char *argv[])
                     strcpy(role, "PROVIDER");
 
                     send(client_socket, "DONE", BUFF_SIZE, 0);
-                    stop = true;
                     break;
                 }
-            }
-        }
-
-        if (stop)
-            continue;
-
-        if (equal(role, "PROVIDER"))
-        {
-            char word[BUFF_SIZE];
-
-            bzero(word, BUFF_SIZE);
-            printf("Enter a word: ");
-            fgets(word, BUFF_SIZE, stdin);
-
-            send(client_socket, word, BUFF_SIZE, 0);
-
-            char client_res[BUFF_SIZE];
-            bzero(client_res, BUFF_SIZE);
-            recv(client_socket, client_res, BUFF_SIZE, 0);
-
-            if (equal(client_res, "DONE"))
-            {
-                strcpy(role, "GUESSER");
-                print("Client has successfully cleared the round.");
-                continue;
             }
         }
     }
