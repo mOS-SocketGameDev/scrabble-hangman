@@ -10,6 +10,7 @@ A socket-based client-server game built in C. Scrabble of Death is a two-player 
 - In running the game, make sure that the server is up and running, waiting for connections from 2 clients. `make run-server`
 - Run the client 1 `make run-client-1`
 - Run the client 2 `make run-client-2`
+- make SERVER_IP= PORT= run-client 
 
 ### Configurations:
 ```bash
