@@ -7,11 +7,13 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <ctype.h>
 
 #include "../include/functions.h"
 
+#define MAX_ROUNDS 2
 #define MAX_GUESS_ATTEMPTS 7
-#define MAX_CLIENTS 2
+#define MAX_CLIENTS 4
 #define CATEGORY_SIZE 10
 #define BUFF_SIZE 255
 
@@ -20,12 +22,12 @@ void exit_on_wrong_usage(int argc, char *argv[])
     // Checks if the argument is supplied upon running the program
     if (argc < 2)
     {
-        print("%%RUsage: %s <PORT_NUMBER>%%0", argv[0]);
+        print("Usage: %s <PORT_NUMBER>", argv[0]);
         exit(1);
     }
 }
 
-void pick_category(int c1_sock, int c2_sock)
+char *pick_category(int c1_sock)
 {
     char *categories[CATEGORY_SIZE] =
         {
@@ -43,60 +45,35 @@ void pick_category(int c1_sock, int c2_sock)
 
     int random_index = rand() % CATEGORY_SIZE;
 
-    print("%%G[Server]: The category is: %s%%0", categories[random_index]);
-
-    // send 2 buffers
-    int res1_1 = send(c1_sock, categories[random_index], BUFF_SIZE, 0);
-    int res1_2 = send(c2_sock, categories[random_index], BUFF_SIZE, 0);
+    send(c1_sock, categories[random_index], BUFF_SIZE, 0);
+    return categories[random_index];
 }
 
-int assign_player_roles(int c1_sock, int c2_sock)
+int pick_role(int c1_sock)
 {
     int random_index = rand() % MAX_CLIENTS;
-    int s_category0_rs, s_category1_rs;
 
-    if (random_index == 0)
-    {
-        print("%%Y[Server]: Client 1 is the Guesser!%%0");
-        print("%%Y[Server]: Client 2 is the Provider!%%0");
-        // send 2 buffers
-        s_category0_rs = send(c1_sock, "GUESSER", BUFF_SIZE, 0);
-        s_category1_rs = send(c2_sock, "PROVIDER", BUFF_SIZE, 0);
-    }
-    else
-    {
-        print("%%Y[Server]: Client 1 is the Provider!%%0");
-        print("%%Y[Server]: Client 2 is the Guesser!%%0");
-        // send 2 buffers
-        s_category0_rs = send(c1_sock, "PROVIDER", BUFF_SIZE, 0);
-        s_category1_rs = send(c2_sock, "GUESSER", BUFF_SIZE, 0);
-    }
+    // 0 => server
+    // 1 => client
+    char *role = (random_index == 0) ? "GUESSER" : "PROVIDER";
+    send(c1_sock, role, BUFF_SIZE, 0);
 
-    if (s_category0_rs < 0 || s_category1_rs < 0)
-    {
-        exit_with_error("Sending categories failed.");
-    }
-
-    // return which one is the guesser
     return random_index;
 }
 
 int main(int argc, char *argv[])
 {
+    srand(time(NULL));
     print_logo();
 
     int PORT_NUMBER = atoi(argv[1]);
-    int server_sock;
-    int clients[MAX_CLIENTS];
 
     struct sockaddr_in server_addr, client_addr;
-
-    srand(time(NULL));
 
     exit_on_wrong_usage(argc, argv);
 
     // create a socket for incoming connections
-    server_sock = socket(AF_INET, SOCK_STREAM, 0);
+    int server_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (server_sock < 0)
     {
         exit_with_error("Error: socket() Failed.");
@@ -104,53 +81,97 @@ int main(int argc, char *argv[])
 
     // bind socket to a port
     bind_to_server(server_sock, PORT_NUMBER);
-    print(" %%GServer is starting...%%0");
-    print(" %%GWaiting for connections...%%0");
+    print("Server is starting...");
+    print("Waiting for connections...");
+
     // accept the first connection
     memset(&client_addr, 0, sizeof(client_addr));
-    clients[0] = accept_client(server_sock, &client_addr);
-    clients[1] = accept_client(server_sock, &client_addr);
-
-    bool is_client_full = (clients[0] != 0 && clients[1] != 0);
-
-    if (is_client_full)
+    int client_socket = accept_client(server_sock, &client_addr);
+    if (client_socket < 0)
     {
-        // initialize game configs
-        print("%%G[Server]: Game is starting...%%0");
+        exit_with_error("Error: accept() Failed.");
+    }
 
-        pick_category(clients[0], clients[1]);
-        int guesser_res = assign_player_roles(clients[0], clients[1]);
+    print("Client successfully connected.");
 
-        // handle the communication here...
-        char message[BUFF_SIZE];
-        int recv_to = (guesser_res == 0) ? 1 : 0;
-        int send_to = (recv_to == 0) ? 1 : 0;
+    // start game
+    print("--- Starting Game ---");
 
-        // recieve the first word and send to both clients
-        bzero(message, BUFF_SIZE);
-        int r_message0_res = recv(clients[recv_to], message, BUFF_SIZE, 0);
-        int s_message0_res = send(clients[send_to], message, BUFF_SIZE, 0);
+    int current_attempts = MAX_GUESS_ATTEMPTS;
 
-        int attempts = 0;
-        while (attempts != MAX_GUESS_ATTEMPTS)
+    // send category
+    char *category = pick_category(client_socket);
+    int roleNo = pick_role(client_socket);
+
+    char role[BUFF_SIZE];
+    strcpy(role, (roleNo == 0) ? "PROVIDER" : "GUESSER");
+
+    for (int i = 0; i < MAX_ROUNDS; i++)
+    {
+        bool stop = false;
+
+        print("--------------------------------------");
+        print("CATEGORY: %s", category);
+        print("ROLE: %s", role);
+
+        if (equal(role, "GUESSER"))
         {
-            // send/recieve the clients guesses
-            bzero(message, BUFF_SIZE);
-            int r_message1_res = recv(clients[send_to], message, BUFF_SIZE, 0);
-            int s_message1_res = send(clients[recv_to], message, BUFF_SIZE, 0);
+            print("Waiting for client to provide word...");
+            char word[BUFF_SIZE];
 
-            attempts++;
+            recv(client_socket, word, BUFF_SIZE, 0);
 
-            if (attempts == MAX_GUESS_ATTEMPTS)
+            char masked_message[BUFF_SIZE];
+            hide_word(masked_message, word);
+
+            print("The word is: %s", masked_message);
+
+            char guess[BUFF_SIZE];
+            while (1)
             {
-                print("%%R[Server]: Guesser lose.%%0");
-                close_sockets(clients[0], clients[1], server_sock);
+                bool res = guess_handler(word);
+
+                if (res)
+                {
+                    // signal the server that the round is finished
+                    // time to swap
+                    strcpy(role, "PROVIDER");
+
+                    send(client_socket, "DONE", BUFF_SIZE, 0);
+                    stop = true;
+                    break;
+                }
+            }
+        }
+
+        if (stop)
+            continue;
+
+        if (equal(role, "PROVIDER"))
+        {
+            char word[BUFF_SIZE];
+
+            bzero(word, BUFF_SIZE);
+            printf("Enter a word: ");
+            fgets(word, BUFF_SIZE, stdin);
+
+            send(client_socket, word, BUFF_SIZE, 0);
+
+            char client_res[BUFF_SIZE];
+            bzero(client_res, BUFF_SIZE);
+            recv(client_socket, client_res, BUFF_SIZE, 0);
+
+            if (equal(client_res, "DONE"))
+            {
+                strcpy(role, "GUESSER");
+                print("Client has successfully cleared the round.");
+                continue;
             }
         }
     }
 
     // close the sockets
-    close_sockets(clients[0], clients[1], server_sock);
+    close_sockets(client_socket, server_sock);
 
     return 0;
 }
