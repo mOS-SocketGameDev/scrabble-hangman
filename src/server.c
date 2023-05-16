@@ -11,7 +11,7 @@
 
 #include "../include/functions.h"
 
-#define MAX_ROUNDS 2
+#define MAX_ROUNDS 4
 #define MAX_GUESS_ATTEMPTS 7
 #define MAX_CLIENTS 4
 #define CATEGORY_SIZE 10
@@ -108,8 +108,6 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < MAX_ROUNDS; i++)
     {
-        bool stop = false;
-
         print("--------------------------------------");
         print("CATEGORY: %s", category);
         print("ROLE: %s", role);
@@ -138,14 +136,10 @@ int main(int argc, char *argv[])
                     strcpy(role, "PROVIDER");
 
                     send(client_socket, "DONE", BUFF_SIZE, 0);
-                    stop = true;
                     break;
                 }
             }
         }
-
-        if (stop)
-            continue;
 
         if (equal(role, "PROVIDER"))
         {
