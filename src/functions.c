@@ -148,7 +148,8 @@ void bind_to_server(int server_sock, int port)
     // Get the dynamically assigned port
     struct sockaddr_in assigned_address;
     socklen_t address_length = sizeof(assigned_address);
-    if (getsockname(server_sock, (struct sockaddr *)&assigned_address, &address_length) == -1) {
+    if (getsockname(server_sock, (struct sockaddr *)&assigned_address, &address_length) == -1)
+    {
         perror("Failed to get socket name");
         close(server_sock);
     }

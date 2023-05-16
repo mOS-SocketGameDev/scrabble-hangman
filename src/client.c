@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include "../include/functions.h"
 
@@ -39,7 +40,7 @@ void draw_hangman(int guess_count)
     case 0:
         print("_______________________________________________________");
         print("|                                                     |");
-        print("|      (----)	 	                     (----)      |");
+        print("|      (----)	 	                    (----)      |");
         print("|     (* ( )*)     |_______________|     (* ( )*)     |");
         print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
         print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
@@ -57,7 +58,7 @@ void draw_hangman(int guess_count)
     case 1:
         print("_______________________________________________________");
         print("|                                                     |");
-        print("|      (----)	 	                     (----)      |");
+        print("|      (----)	 	                    (----)      |");
         print("|     (* ( )*)     |_______________|     (* ( )*)     |");
         print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
         print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
@@ -75,7 +76,7 @@ void draw_hangman(int guess_count)
     case 2:
         print("_______________________________________________________");
         print("|                                                     |");
-        print("|      (----)	 	                     (----)      |");
+        print("|      (----)	 	                    (----)      |");
         print("|     (* ( )*)     |_______________|     (* ( )*)     |");
         print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
         print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
@@ -93,7 +94,7 @@ void draw_hangman(int guess_count)
     case 3:
         print("_______________________________________________________");
         print("|                                                     |");
-        print("|      (----)	 	                     (----)      |");
+        print("|      (----)	 	                    (----)      |");
         print("|     (* ( )*)     |_______________|     (* ( )*)     |");
         print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
         print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
@@ -111,7 +112,7 @@ void draw_hangman(int guess_count)
     case 4:
         print("_______________________________________________________");
         print("|                                                     |");
-        print("|      (----)	 	                     (----)      |");
+        print("|      (----)	 	                    (----)      |");
         print("|     (* ( )*)     |_______________|     (* ( )*)     |");
         print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
         print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
@@ -129,7 +130,7 @@ void draw_hangman(int guess_count)
     case 5:
         print("_______________________________________________________");
         print("|                                                     |");
-        print("|      (----)	 	                     (----)      |");
+        print("|      (----)	 	                    (----)      |");
         print("|     (* ( )*)     |_______________|     (* ( )*)     |");
         print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
         print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
@@ -147,7 +148,7 @@ void draw_hangman(int guess_count)
     case 6:
         print("_______________________________________________________");
         print("|                                                     |");
-        print("|      (----)	 	                     (----)      |");
+        print("|      (----)	 	                    (----)      |");
         print("|     (* ( )*)     |_______________|     (* ( )*)     |");
         print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
         print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
@@ -165,7 +166,7 @@ void draw_hangman(int guess_count)
     case 7:
         print("_______________________________________________________");
         print("|                                                     |");
-        print("|      (----)	 	                     (----)      |");
+        print("|      (----)	 	                    (----)      |");
         print("|     (* ( )*)     |_______________|     (* ( )*)     |");
         print("|    ( (*) )) )    | H A N G M A N |    ( ( ) *) )    |");
         print("|   ( ( (* )*) )   |---------------|   ( ( (* )*) )   |");
@@ -184,59 +185,63 @@ void draw_hangman(int guess_count)
     }
 }
 
-void draw_word_state(char word[], int letter_states[])
-{
-    printf("\nTHE WORD: ");
-    int word_length = strlen(word);
-    for (int i = 0; i < word_length; i++)
-    {
-        if (letter_states[i])
-        {
-            printf("%c", word[i]);
-        }
-        else
-        {
-            printf("*");
-        }
-    }
-    printf("\n");
-}
-
 // Take a guess from the user
-char take_guess(char guessed_letters[])
+char guess(char word[])
 {
-    char guess;
-    printf("Enter a letter: ");
-    scanf(" %c", &guess);
+    char guessed_word[strlen(word)];
 
-    while (strchr(guessed_letters, guess) != NULL)
+    // Initialize guessedWord with asterisks
+    for (int i = 0; i < strlen(word); i++)
     {
-        printf("You already guessed that letter.\n");
-        scanf("Enter a word: %c", &guess);
+        guessed_word[i] = '*';
     }
-    guessed_letters[strlen(guessed_letters)] = guess;
-    return guess;
-}
+    guessed_word[strlen(word)] = '\0';
 
-// Check if the guess is correct and update the state of the word being guessed
-int check_guess(char guess, char word[], int letter_states[])
-{
-    int word_length = strlen(word);
-    int correct = 0;
-    // if (isalpha(guess))
-    // {
-    //     guess = tolower(guess);
-        for (int i = 0; i < word_length; i++)
+    bool all_characters_guessed = false;
+    int wrong_guesses = 0; // Counter for wrong guesses
+
+    while (!all_characters_guessed)
+    {
+        if (wrong_guesses == MAX_GUESS_ATTEMPTS)
         {
-            if (word[i] == guess)
+            printf("You lost!\n");
+            break;
+        }
+
+        print("%%GThe word is: %s%%0", guessed_word);
+        printf("  Guess: ");
+        char guess;
+        scanf(" %c", &guess);
+        guess = tolower(guess);
+
+        int found = 0;
+        for (int i = 0; i < strlen(word); i++)
+        {
+            if (tolower(word[i]) == guess)
             {
-                letter_states[i] = 1;
-                correct = 1;
+                guessed_word[i] = word[i];
+                found = 1;
             }
         }
-    // }
 
-    return correct;
+        if (!found)
+        {
+            wrong_guesses++;
+            print("%%RWrong guess! Remaining attempts: %d%%0", (MAX_GUESS_ATTEMPTS - wrong_guesses));
+            draw_hangman(wrong_guesses);
+        }
+
+        all_characters_guessed = true;
+        for (int i = 0; i < strlen(word); i++)
+        {
+            if (guessed_word[i] == '*')
+            {
+                all_characters_guessed = false;
+                break;
+            }
+        }
+        print("");
+    }
 }
 
 // Check if the game is over
@@ -267,17 +272,14 @@ int is_game_over(char word[], int letter_states[], int guess_count)
     return 0;
 }
 
-
 int main(int argc, char *argv[])
 {
 
-  char word[MAX_WORD_LENGTH];
-  char guessed_letters[MAX_GUESSES] = {'\0'};
-  int letter_states[MAX_WORD_LENGTH] = {0};
+    char word[MAX_WORD_LENGTH];
+    int letter_states[MAX_WORD_LENGTH] = {0};
 
-  int guess_count = 0;
-  int word_length;
-
+    int guess_count = 0;
+    int word_length;
 
     print_logo();
 
@@ -303,8 +305,7 @@ int main(int argc, char *argv[])
     connect_to_server(client_sock, &server_addr);
 
     // start of communication/game
-    print("%%GConnected to server at %s:%s.%%0", SERVER_IP_ADDRESS, SERVER_PORT);
-    print("%%G|-----------------------------------------------------|%%0");
+    print("%%GSuccessfully connected to server at %s:%s.%%0", SERVER_IP_ADDRESS, SERVER_PORT);
     int current_attempts = 7;
     // init the buffers to be recieved -- category, role.
     char category[BUFF_SIZE], role[BUFF_SIZE];
@@ -313,6 +314,7 @@ int main(int argc, char *argv[])
     bzero(category, BUFF_SIZE);
     int r_category_res = recv(client_sock, category, BUFF_SIZE, 0);
 
+    print("%%G--- Starting Game ---%%0");
     // categories is...
     print("CATEGORY: %%G%s%%0", category);
 
@@ -325,7 +327,6 @@ int main(int argc, char *argv[])
     print("");
 
     char message[BUFF_SIZE];
-    // int guess_count = 0;
 
     if (equal(role, "PROVIDER"))
     {
@@ -367,55 +368,12 @@ int main(int argc, char *argv[])
         // mask the word
         char masked_message[BUFF_SIZE];
         hide_word(masked_message, message);
-        print("The word is: %s", masked_message);
 
         // main loop
-        while (guess_count < MAX_GUESS_ATTEMPTS)
-        {
-            // an input from the user
-            printf("  Guess: ");
-            bzero(message, BUFF_SIZE);
-            fgets(message, BUFF_SIZE, stdin);
-
-            // send to the server
-            int s_message_res = send(client_sock, message, BUFF_SIZE, 0);
-
-            char guess = take_guess(guessed_letters);
-          int correct = check_guess(guess, word, letter_states);
-
-          if (correct)
-          {
-              printf("Correct guess!\n");
-          }
-          else
-          {
-              printf("Incorrect guess!\n");
-              guess_count++;
-              draw_hangman(guess_count);
-          }
-
-          draw_word_state(word, letter_states);
-
-
-          if (is_game_over(word, letter_states, guess_count))
-          {
-              // Game over, break the loop
-              break;
-          }
-          // guess_count++;
-          // if (guess_count == MAX_GUESS_ATTEMPTS) // if 7 guesses have been made, break the loop
-          // {
-          //     print("%%RGuesser used up all attempts.%%0");
-          //     break;
-          // }
-
-        }
+        guess(word);
     }
 
     close(client_sock);
 
     return 0;
 }
-
-
-
