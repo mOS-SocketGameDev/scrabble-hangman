@@ -7,40 +7,16 @@ A socket-based client-server game built in C. Scrabble of Death is a two-player 
 
 #### Make sure you are using Linux or WSL for compiling (since the project uses `MAKE`):
 - First is to make directories such as the bin folders. `make build`
-- In running the game, make sure that the server is up and running, waiting for connections from 2 clients. `make run-server`
-- Run the client 1 `make run-client-1`
-- Run the client 2 `make run-client-2`
+- In running the game, make sure that the server is up and running. To do this use `make run-server`
+- Run the client using `make SERVER_IP=<ip_addr> PORT=<port> run-client`.
+- After 2 clients joined the game, the game will start.
 
 ### Configurations:
 ```bash
 PORT=8000
-CLIENT_1_ADDRESS=127.0.0.1
-CLIENT_2_ADDRESS=127.0.0.2
+SERVER_IP=0
 
-# Manual run of program...
-./bin/server 8000
-./bin/client 127.0.0.n 8000
-```
-
-### Naming Convention:
-```c
-use lower_case
-
-// sending
-int s_category_res = send(client_sock, buff...
-int s_category0_res = send(client_sock, buff...
-if (s_category_res < 0)
-{
-    ...
-}
-```
-
-```c
-// recieving
-int r_category_res = send(client_sock, buff...
-int r_category0_res = send(client_sock, buff...
-if (r_category_res < 0)
-{
-    ...
-}
+# Sample manual run of program...
+./bin/server <PORT>
+./bin/client <SERVER_IP_ADDRESS> <SERVER_PORT>
 ```
