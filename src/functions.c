@@ -10,12 +10,15 @@
 #include <pthread.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-
-#include "../include/functions.h"
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
+
+#include "../include/functions.h"
+
+#define MAX_GUESS_ATTEMPTS 7
+#define BUFF_SIZE 255
 
 void print_logo()
 {
@@ -40,7 +43,6 @@ void print_logo()
  */
 void print(const char *format, ...)
 {
-    printf("  ");
     va_list args;
     va_start(args, format);
     char buffer[1024];
@@ -98,10 +100,9 @@ void exit_with_error(char *error_msg)
     exit(1);
 }
 
-void close_sockets(int c1_sock, int c2_sock, int s_sock)
+void close_sockets(int c1_sock, int s_sock)
 {
     close(c1_sock);
-    close(c2_sock);
     close(s_sock);
 }
 
@@ -168,4 +169,67 @@ int accept_client(int server_sock, struct sockaddr_in *client_addr)
     }
     print("%%G[Server]: Client has successfully joined.%%0");
     return client_sock;
+}
+
+// global
+bool guess_handler(char word[])
+{
+    char guessed_word[BUFF_SIZE];
+    strcpy(guessed_word, word);
+
+    // Initialize guessedWord with asterisks
+    for (int i = 0; i < strlen(guessed_word) - 1; i++)
+    {
+        guessed_word[i] = '*';
+    }
+
+    bool all_characters_guessed = false;
+    int wrong_guesses = 0; // Counter for wrong guesses
+
+    while (!all_characters_guessed)
+    {
+        if (wrong_guesses == MAX_GUESS_ATTEMPTS)
+        {
+            print("%%RYou lost!%%0");
+            return false;
+        }
+
+        if (equal(guessed_word, word))
+        {
+            print("%%GYou guessed the word. You won this round!%%0");
+            return true;
+        }
+
+        print("%%GThe word is: %s%%0", guessed_word);
+        printf("Guess: ");
+        char guess;
+        scanf(" %c", &guess);
+
+        guess = tolower(guess);
+
+        int found = 0;
+        for (int i = 0; i < strlen(guessed_word) - 1; i++)
+        {
+            if (tolower(word[i]) == guess)
+            {
+                guessed_word[i] = word[i];
+                found = 1;
+            }
+        }
+
+        if (!found)
+        {
+            wrong_guesses++;
+            print("%%RWrong guess! Remaining attempts: %d%%0", (MAX_GUESS_ATTEMPTS - wrong_guesses));
+        }
+    }
+}
+
+void hide_word(char masked_message[], char word[])
+{
+    strcpy(masked_message, word);
+    for (int i = 0; i < strlen(masked_message) - 1; i++)
+    {
+        masked_message[i] = '*';
+    }
 }

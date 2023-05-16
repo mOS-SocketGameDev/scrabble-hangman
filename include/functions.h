@@ -3,7 +3,7 @@
 #define FUNCTIONS_H
 
 void exit_with_error(char *error_msg);
-void close_sockets(int c1_sock, int c2_sock, int s_sock);
+void close_sockets(int c1_sock, int s_sock);
 bool equal(char *s1, char *s2);
 
 // client/server connection logic
@@ -14,4 +14,7 @@ int accept_client(int server_sock, struct sockaddr_in *client_addr);
 
 void print(const char *format, ...);
 void print_logo();
+
+void hide_word(char masked_message[], char word[]);
+bool guess_handler(char word[]);
 #endif

@@ -1,4 +1,4 @@
-PORT=8002
+PORT=8001
 IP_ADDRESS := $(shell hostname -I | cut -d' ' -f1)
 SERVER_IP := 0
 
@@ -18,8 +18,8 @@ compile:
 
 # for demonstration in using 2 separate machines.
 run-server: compile
-	@echo "  \033[33m Server IP Address: $(IP_ADDRESS)\033[0m"
-	@echo "  \033[33m Server Port: $(PORT)\033[0m"
+	@echo "\033[33m Server IP Address: $(IP_ADDRESS)\033[0m"
+	@echo "\033[33m Server Port: $(PORT)\033[0m"
 	@./bin/server $(PORT)
 
 # make SERVER_IP= PORT= run-client
