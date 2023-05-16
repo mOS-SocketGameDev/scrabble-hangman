@@ -95,8 +95,6 @@ int main(int argc, char *argv[])
 
     exit_on_wrong_usage(argc, argv);
 
-    print("%%Y[Server]: starting at localhost:%s%%0", argv[1]);
-
     // create a socket for incoming connections
     server_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (server_sock < 0)
@@ -106,7 +104,8 @@ int main(int argc, char *argv[])
 
     // bind socket to a port
     bind_to_server(server_sock, PORT_NUMBER);
-
+    print(" %%GServer is starting...%%0");
+    print(" %%GWaiting for connections...%%0");
     // accept the first connection
     memset(&client_addr, 0, sizeof(client_addr));
     clients[0] = accept_client(server_sock, &client_addr);
