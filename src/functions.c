@@ -21,7 +21,7 @@ void print_logo()
 {
     print("%%Y|-----------------------------------------------------|%%0");
     print("%%Y|                                                     |%%0");
-    print("%%Y|           S C R A B B L E  O F  D E A T H           |%%0");
+    print("%%Y|%%0           %%WS C R A B B L E  O F  D E A T H%%0           %%Y|%%0");
     print("%%Y|                                                     |%%0");
     print("%%Y|-----------------------------------------------------|%%0");
 }
@@ -31,6 +31,10 @@ void print_logo()
  *      %%Y -> YELLOW
  *      %%R -> RED
  *      %%G -> GREEN
+ *      %%B -> BLUE
+ *      %%W -> WHITE
+ *      %%P -> PURPLE
+ *      %%C -> CYAN
  *      %%0 -> RESET
  * EXAMPLE:
  *      print("%%Y[Server]: Server is starting...%%0"); -> prints out a yellow line
@@ -64,6 +68,18 @@ void print(const char *format, ...)
                 break;
             case 'Y':
                 strcpy(color, "\033[33m");
+                break;
+            case 'B':
+                strcpy(color, "\033[34m");
+                break;
+            case 'P':
+                strcpy(color, "\033[35m");
+                break;
+            case 'C':
+                strcpy(color, "\033[36m");
+                break;
+            case 'W':
+                strcpy(color, "\033[37m");
                 break;
             case '0':
                 strcpy(color, "\033[0m");
