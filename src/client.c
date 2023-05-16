@@ -186,16 +186,16 @@ void draw_hangman(int guess_count)
 }
 
 // Take a guess from the user
-char guess(char word[])
+char guess(char word[], int client_socket)
 {
-    char guessed_word[strlen(word)];
+    char guessed_word[BUFF_SIZE];
+    strcpy(guessed_word, word);
 
     // Initialize guessedWord with asterisks
-    for (int i = 0; i < strlen(word); i++)
+    for (int i = 0; i < strlen(guessed_word) - 1; i++)
     {
         guessed_word[i] = '*';
     }
-    guessed_word[strlen(word)] = '\0';
 
     bool all_characters_guessed = false;
     int wrong_guesses = 0; // Counter for wrong guesses
@@ -204,7 +204,13 @@ char guess(char word[])
     {
         if (wrong_guesses == MAX_GUESS_ATTEMPTS)
         {
-            printf("You lost!\n");
+            print("%%RYou lost!%%0");
+            break;
+        }
+
+        if (equal(guessed_word, word))
+        {
+            print("%%GYou guessed the word. You won this round!%%0");
             break;
         }
 
@@ -212,10 +218,16 @@ char guess(char word[])
         printf("  Guess: ");
         char guess;
         scanf(" %c", &guess);
+
+        char buffer[BUFF_SIZE];
+        buffer[0] = guess;
+        buffer[1] = '\0';
+        send(client_socket, buffer, BUFF_SIZE, 0);
+
         guess = tolower(guess);
 
         int found = 0;
-        for (int i = 0; i < strlen(word); i++)
+        for (int i = 0; i < strlen(guessed_word) - 1; i++)
         {
             if (tolower(word[i]) == guess)
             {
@@ -230,17 +242,6 @@ char guess(char word[])
             print("%%RWrong guess! Remaining attempts: %d%%0", (MAX_GUESS_ATTEMPTS - wrong_guesses));
             draw_hangman(wrong_guesses);
         }
-
-        all_characters_guessed = true;
-        for (int i = 0; i < strlen(word); i++)
-        {
-            if (guessed_word[i] == '*')
-            {
-                all_characters_guessed = false;
-                break;
-            }
-        }
-        print("");
     }
 }
 
@@ -370,7 +371,7 @@ int main(int argc, char *argv[])
         hide_word(masked_message, message);
 
         // main loop
-        guess(word);
+        guess(word, client_sock);
     }
 
     close(client_sock);
