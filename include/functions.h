@@ -17,5 +17,5 @@ void print_logo();
 
 void draw_hangman(int guess_count);
 void hide_word(char masked_message[], char word[]);
-bool guess_handler(char word[]);
+bool guess_handler(char word[], int current_attempts);
 #endif

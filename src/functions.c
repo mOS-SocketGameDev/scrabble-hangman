@@ -389,7 +389,7 @@ void draw_hangman(int guess_count)
     }
 }
 
-bool guess_handler(char word[])
+bool guess_handler(char word[], int current_attempts)
 {
     char guessed_word[BUFF_SIZE];
     strcpy(guessed_word, word);
@@ -403,7 +403,7 @@ bool guess_handler(char word[])
     bool all_characters_guessed = false;
     int wrong_guesses = 0; // Counter for wrong guesses
 
-    while (!all_characters_guessed)
+    while (!all_characters_guessed && current_attempts > 0)
     {
         if (wrong_guesses == MAX_GUESS_ATTEMPTS)
         {

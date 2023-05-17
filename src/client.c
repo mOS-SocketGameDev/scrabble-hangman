@@ -68,67 +68,79 @@ int main(int argc, char *argv[])
     bzero(role, BUFF_SIZE);
     recv(client_socket, role, BUFF_SIZE, 0);
 
+    bool game_over = false;
     for (int i = 0; i < MAX_ROUNDS; i++)
     {
-        bool stop = false;
-
-        print("%%C|-----------------------------------------------------|");
-        print(" ");
-        print(" %%PCATEGORY:%%0 %s", category);
-        print(" %%PROLE:%%0 %s", role);
-        print(" ");
-
-        if (equal(role, "PROVIDER"))
+        if (game_over == false)
         {
-            char word[BUFF_SIZE];
-
-            bzero(word, BUFF_SIZE);
-            printf(" Enter a word: ");
-            fgets(word, BUFF_SIZE, stdin);
-
-            send(client_socket, word, BUFF_SIZE, 0);
-
-            char client_res[BUFF_SIZE];
-            bzero(client_res, BUFF_SIZE);
-            recv(client_socket, client_res, BUFF_SIZE, 0);
-
-            if (equal(client_res, "DONE"))
-            {
-                strcpy(role, "GUESSER");
-                print(" ");
-                print(" %%GClient has successfully cleared the round.");
-                print(" ");
-                continue;
-            }
-        }
-
-        if (equal(role, "GUESSER"))
-        {
+            print("%%C|----------------------ROUND %d------------------------|", i + 1);
             print(" ");
-            print(" %%YWaiting for client to provide word...");
+            print(" %%PCATEGORY:%%0 %s", category);
+            print(" %%PROLE:%%0 %s", role);
             print(" ");
-            char word[BUFF_SIZE];
 
-            recv(client_socket, word, BUFF_SIZE, 0);
-
-            char masked_message[BUFF_SIZE];
-            hide_word(masked_message, word);
-
-            print(" The word is: %s", masked_message);
-
-            char guess[BUFF_SIZE];
-            while (1)
+            if (equal(role, "PROVIDER"))
             {
-                bool res = guess_handler(word);
+                char word[BUFF_SIZE];
 
-                if (res)
+                bzero(word, BUFF_SIZE);
+                printf(" Enter a word: ");
+                fgets(word, BUFF_SIZE, stdin);
+
+                send(client_socket, word, BUFF_SIZE, 0);
+
+                char client_res[BUFF_SIZE];
+                bzero(client_res, BUFF_SIZE);
+                recv(client_socket, client_res, BUFF_SIZE, 0);
+
+                if (equal(client_res, "DONE"))
                 {
-                    // signal the server that the round is finished
-                    // time to swap
-                    strcpy(role, "PROVIDER");
-
-                    send(client_socket, "DONE", BUFF_SIZE, 0);
+                    strcpy(role, "GUESSER");
+                    print(" ");
+                    print(" %%GClient has successfully cleared the round.");
+                    print(" ");
+                    continue;
+                }
+                else
+                {
+                    game_over = true;
                     break;
+                }
+            }
+
+            if (equal(role, "GUESSER"))
+            {
+                print(" ");
+                print(" %%YWaiting for client to provide word...");
+                print(" ");
+                char word[BUFF_SIZE];
+
+                recv(client_socket, word, BUFF_SIZE, 0);
+
+                char masked_message[BUFF_SIZE];
+                hide_word(masked_message, word);
+
+                print(" The word is: %s", masked_message);
+
+                char guess[BUFF_SIZE];
+                while (1)
+                {
+                    bool res = guess_handler(word, current_attempts);
+
+                    if (res)
+                    {
+                        // signal the server that the round is finished
+                        // time to swap
+                        strcpy(role, "PROVIDER");
+
+                        send(client_socket, "DONE", BUFF_SIZE, 0);
+                        break;
+                    }
+                    else
+                    {
+                        game_over = true;
+                        break;
+                    }
                 }
             }
         }
